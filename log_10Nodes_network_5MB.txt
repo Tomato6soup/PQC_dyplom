@@ -1,0 +1,59 @@
+> Task :simulator:compileJava
+> Task :simulator:processResources NO-SOURCE
+> Task :simulator:classes
+
+> Task :simulator:run
+simblock.block.ProofOfWorkBlock@4e50df2e:0
+9,0
+3,50
+6,148
+1,198
+8,393
+5,658
+10,787
+2,1327
+4,1471
+7,1726
+
+simblock.block.ProofOfWorkBlock@27f8302d:1
+9,0
+3,72
+6,88
+1,269
+8,409
+5,543
+10,841
+7,1082
+2,1382
+4,1524
+
+simblock.block.ProofOfWorkBlock@5c8da962:2
+10,0
+8,114
+4,191
+5,249
+6,519
+9,653
+3,798
+2,995
+7,1200
+1,1365
+
+simblock.block.ProofOfWorkBlock@6f79caec:3
+9,0
+6,69
+1,85
+3,261
+5,530
+10,658
+8,809
+4,1426
+2,1729
+7,2098
+
+
+0
+2813
+
+BUILD SUCCESSFUL in 19s
+2 actionable tasks: 2 executed
