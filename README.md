@@ -4,31 +4,31 @@ Niniejszy projekt został zrealizowany w ramach pracy inżynierskiej i skupia si
 
 ## 🚀 Główne Cele Projektu
 
-    **Implementacja parametrów PQC:** Dostosowanie węzła blockchain (Substrate) do obsługi zwiększonych limitów danych.
+   **Implementacja parametrów PQC:** Dostosowanie węzła blockchain (Substrate) do obsługi zwiększonych limitów danych.
 
-    **Symulacja sieci:** Przeprowadzenie testów propagacji dla różnych liczebności węzłów (10, 50, 100) przy użyciu symulatora SimBlock.
+   **Symulacja sieci:** Przeprowadzenie testów propagacji dla różnych liczebności węzłów (10, 50, 100) przy użyciu symulatora SimBlock.
 
-    **Analiza Skalowalności:** Porównanie wydajności klasycznych podpisów (ECDSA/Ed25519) z rozwiązaniami postkwantowymi.
+   **Analiza Skalowalności:** Porównanie wydajności klasycznych podpisów (ECDSA/Ed25519) z rozwiązaniami postkwantowymi.
 
-    **Wizualizacja Danych:** Automatyczna generacja wykresów zależności czasu propagacji od rozmiaru bloku i liczby peerów.
+   **Wizualizacja Danych:** Automatyczna generacja wykresów zależności czasu propagacji od rozmiaru bloku i liczby peerów.
 
 ## 🛠️ Stos Technologiczny
 
-    **Blockchain:** Substrate SDK/Polkadot SDK (Rust) – modyfikacja parametrów Runtime (BlockLength, BlockWeights).
+   **Blockchain:** Substrate SDK/Polkadot SDK (Rust) – modyfikacja parametrów Runtime (BlockLength, BlockWeights).
 
-    **Symulacja:** SimBlock (Java/Gradle) – modelowanie opóźnień sieciowych w skali globalnej.
+   **Symulacja:** SimBlock (Java/Gradle) – modelowanie opóźnień sieciowych w skali globalnej.
 
-    **Analiza Danych:** Python 3 (Pandas, Matplotlib) – przetwarzanie logów i generowanie wykresów statystycznych.
+   **Analiza Danych:** Python 3 (Pandas, Matplotlib) – przetwarzanie logów i generowanie wykresów statystycznych.
 
-    **Środowisko:** Ubuntu Linux / Oracle VirtualBox.
+   **Środowisko:** Ubuntu Linux / Oracle VirtualBox.
 
 ## 📊 Metodyka Badań
 
 Eksperymenty zostały podzielone na dwa główne nurty:
 
-    **Testy na realnym węźle (Substrate)**: Pomiar czasu weryfikacji bloków o rozmiarach 5MB, 10MB oraz 20MB.
+   **Testy na realnym węźle (Substrate)**: Pomiar czasu weryfikacji bloków o rozmiarach 5MB, 10MB oraz 20MB.
 
-    **Symulacje sieciowe (SimBlock)**: Badanie czasu rozchodzenia się informacji w topologii P2P przy założeniu narzutu danych generowanego przez podpisy PQC.
+   **Symulacje sieciowe (SimBlock)**: Badanie czasu rozchodzenia się informacji w topologii P2P przy założeniu narzutu danych generowanego przez podpisy PQC.
 
 ## Autorka:
 **_Anna Tkach_ _2026_**
