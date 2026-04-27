@@ -30,5 +30,24 @@ Eksperymenty zostały podzielone na dwa główne nurty:
 
    **Symulacje sieciowe (SimBlock)**: Badanie czasu rozchodzenia się informacji w topologii P2P przy założeniu narzutu danych generowanego przez podpisy PQC.
 
+   Przygotowanie danych o rozmiarach:
+   
+Na podstawie literatury (np. dokumentacji NIST) przyjęto parametry dla 128-bitowego poziomu bezpieczeństwa:
+
+    Ed25519 (Klasyczny): Podpis: 64 B, Klucz publiczny: 32 B.
+
+    Dilithium2 (PQC): Podpis: 2420 B, Klucz publiczny: 1312 B.
+
+    SPHINCS+-128f (PQC): Podpis: 17088 B, Klucz publiczny: 32 B.
+
+Wyliczenie narzutu na blok (Overhead):
+Załóżmy, że blok zawiera 500 transakcji. Obliczamy całkowity rozmiar danych podpisów w bloku:
+
+    Klasyczny: 500×96 B≈0.048 MB.
+
+    Dilithium: 500×3.7 KB≈1.8 MB.
+
+    SPHINCS+: 500×17 KB≈8.5 MB.
+
 ## Autorka:
 **_Anna Tkach_ _2026_**
