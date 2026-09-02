@@ -1,0 +1,96 @@
+ECDSA — 500 tx  (weryfikacja CPU = 0.059 s)
+N,Czas weryfikacji CPU [s],Średni czas propagacji (Mean) [s],Udział weryfikacji w propagacji [%]
+500,0.059,4.311,1.37
+1000,0.059,4.311,1.37
+1500,0.059,4.311,1.37
+2000,0.059,4.311,1.37
+4000,0.059,4.311,1.37
+
+ECDSA — 1000 tx  (weryfikacja CPU = 0.141 s)
+N,Czas weryfikacji CPU [s],Średni czas propagacji (Mean) [s],Udział weryfikacji w propagacji [%]
+500,0.141,4.311,3.27
+1000,0.141,4.311,3.27
+1500,0.141,4.311,3.27
+2000,0.141,4.311,3.27
+4000,0.141,4.311,3.27
+
+ECDSA — 1500 tx  (weryfikacja CPU = 0.217 s)
+N,Czas weryfikacji CPU [s],Średni czas propagacji (Mean) [s],Udział weryfikacji w propagacji [%]
+500,0.217,4.311,5.03
+1000,0.217,4.311,5.03
+1500,0.217,4.311,5.03
+2000,0.217,4.311,5.03
+4000,0.217,4.311,5.03
+
+ECDSA — 2000 tx  (weryfikacja CPU = 0.255 s)
+N,Czas weryfikacji CPU [s],Średni czas propagacji (Mean) [s],Udział weryfikacji w propagacji [%]
+500,0.255,4.311,5.92
+1000,0.255,4.311,5.92
+1500,0.255,4.311,5.92
+2000,0.255,4.311,5.92
+4000,0.255,4.311,5.92
+
+Dilithium2 (ML-DSA-44) — 500 tx  (weryfikacja CPU = 0.111 s)
+N,Czas weryfikacji CPU [s],Średni czas propagacji (Mean) [s],Udział weryfikacji w propagacji [%]
+500,0.111,4.311,2.57
+1000,0.111,4.311,2.57
+1500,0.111,4.311,2.57
+2000,0.111,4.311,2.57
+4000,0.111,4.311,2.57
+
+Dilithium2 (ML-DSA-44) — 1000 tx  (weryfikacja CPU = 0.114 s)
+N,Czas weryfikacji CPU [s],Średni czas propagacji (Mean) [s],Udział weryfikacji w propagacji [%]
+500,0.114,4.311,2.64
+1000,0.114,4.311,2.64
+1500,0.114,4.311,2.64
+2000,0.114,4.311,2.64
+4000,0.114,4.311,2.64
+
+Dilithium2 (ML-DSA-44) — 1500 tx  (weryfikacja CPU = 0.253 s)
+N,Czas weryfikacji CPU [s],Średni czas propagacji (Mean) [s],Udział weryfikacji w propagacji [%]
+500,0.253,4.311,5.87
+1000,0.253,4.311,5.87
+1500,0.253,4.311,5.87
+2000,0.253,4.311,5.87
+4000,0.253,4.311,5.87
+
+Dilithium2 (ML-DSA-44) — 2000 tx  (weryfikacja CPU = 0.233 s)
+N,Czas weryfikacji CPU [s],Średni czas propagacji (Mean) [s],Udział weryfikacji w propagacji [%]
+500,0.233,4.311,5.40
+1000,0.233,4.311,5.40
+1500,0.233,4.311,5.40
+2000,0.233,4.311,5.40
+4000,0.233,4.311,5.40
+
+SPHINCS+ (SLH-DSA) — 500 tx  (weryfikacja CPU = 1.514 s)
+N,Czas weryfikacji CPU [s],Średni czas propagacji (Mean) [s],Udział weryfikacji w propagacji [%]
+500,1.514,4.311,35.12
+1000,1.514,4.311,35.12
+1500,1.514,4.311,35.12
+2000,1.514,4.311,35.12
+4000,1.514,4.311,35.12
+
+SPHINCS+ (SLH-DSA) — 1000 tx  (weryfikacja CPU = 3.267 s)
+N,Czas weryfikacji CPU [s],Średni czas propagacji (Mean) [s],Udział weryfikacji w propagacji [%]
+500,3.267,4.311,75.78
+1000,3.267,4.311,75.78
+1500,3.267,4.311,75.78
+2000,3.267,4.311,75.78
+4000,3.267,4.311,75.78
+
+SPHINCS+ (SLH-DSA) — 1500 tx  (weryfikacja CPU = 3.881 s)
+N,Czas weryfikacji CPU [s],Średni czas propagacji (Mean) [s],Udział weryfikacji w propagacji [%]
+500,3.881,4.311,90.03
+1000,3.881,4.311,90.03
+1500,3.881,4.311,90.03
+2000,3.881,4.311,90.03
+4000,3.881,4.311,90.03
+
+SPHINCS+ (SLH-DSA) — 2000 tx  (weryfikacja CPU = 5.105 s)
+N,Czas weryfikacji CPU [s],Średni czas propagacji (Mean) [s],Udział weryfikacji w propagacji [%]
+500,5.105,4.311,118.42
+1000,5.105,4.311,118.42
+1500,5.105,4.311,118.42
+2000,5.105,4.311,118.42
+4000,5.105,4.311,118.42
+
