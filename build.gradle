@@ -22,6 +22,15 @@ subprojects {
     apply plugin: 'eclipse'
 
     applicationDefaultJvmArgs = ["-Dfile.encoding=UTF-8"]
+    // --- DODAJ TO: przekazanie -D... do procesu symulacji ('run') ---
+    tasks.withType(JavaExec) {
+        ['seed', 'nodes', 'blocksize', 'verifms'].each { klucz ->
+            if (System.getProperty(klucz) != null) {
+                systemProperty klucz, System.getProperty(klucz)
+            }
+        }
+    }
+    // --- koniec dodatku ---
 
     idea.module {
         sourceDirs += file(srcDir)
