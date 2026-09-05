@@ -1,53 +1,88 @@
-# Post-Quantum Cryptography (PQC) Impact on Blockchain Scalability
+# Analiza skalowalności protokołów PQC w systemach blockchain
 
-Niniejszy projekt został zrealizowany w ramach pracy inżynierskiej i skupia się na analizie wpływu algorytmów kryptografii postkwantowej na wydajność i skalowalność sieci blockchain. Głównym celem jest zbadanie, jak zwiększony rozmiar podpisów PQC (np. Dilithium, Sphincs+) wpływa na czas propagacji bloków oraz przepustowość sieci.
+Praca inżynierska poświęcona wpływowi **postkwantowych algorytmów podpisu
+cyfrowego** (Dilithium2 / ML-DSA, SPHINCS+ / SLH-DSA) na wydajność i
+skalowalność sieci blockchain typu peer-to-peer, w porównaniu z klasycznym
+algorytmem ECDSA.
 
-## 🚀 Główne Cele Projektu
+> **Autor:** Anna Tkach
+> **Uczelnia:** Uniwersytet Bielsko-Bialski, Wydział Budowy Maszyn i Informatyki
+> **Kierunek:** Informatyka (Sieci komputerowe i bezpieczeństwo sieciowe)
+> **Rok akademicki:** 2025/2026
 
-   **Implementacja parametrów PQC:** Dostosowanie węzła blockchain (Substrate) do obsługi zwiększonych limitów danych.
+---
 
-   **Symulacja sieci:** Przeprowadzenie testów propagacji dla różnych liczebności węzłów (10, 50, 100) przy użyciu symulatora SimBlock.
+## O czym jest ta praca
 
-   **Analiza Skalowalności:** Porównanie wydajności klasycznych podpisów (ECDSA/Ed25519) z rozwiązaniami postkwantowymi.
+Rozwój komputerów kwantowych zagraża klasycznej kryptografii asymetrycznej,
+na której opiera się bezpieczeństwo systemów blockchain. Odpowiedzią są
+algorytmy postkwantowe (PQC), które jednak wiążą się z **znacznie większymi
+podpisami i kluczami**. Praca bada, jak ta zmiana rozmiaru danych przekłada
+się na realną skalowalność rozproszonej sieci blockchain.
 
-   **Wizualizacja Danych:** Automatyczna generacja wykresów zależności czasu propagacji od rozmiaru bloku i liczby peerów.
+**Cel pracy:** ilościowe rozdzielenie dwóch źródeł narzutu przy migracji na
+PQC — kosztu obliczeniowego (weryfikacja podpisu przez procesor) od kosztu
+sieciowego (propagacja większych bloków w sieci).
 
-## 🛠️ Stos Technologiczny
+## Jak przebiegało badanie
 
-   **Blockchain:** Substrate SDK/Polkadot SDK (Rust) – modyfikacja parametrów Runtime (BlockLength, BlockWeights).
+Zaprojektowano dwuetapowe środowisko badawcze:
 
-   **Symulacja:** SimBlock (Java/Gradle) – modelowanie opóźnień sieciowych w skali globalnej.
+| Etap | Skala | Co mierzy |
+|------|-------|-----------|
+| **Mikro** | pojedynczy węzeł | rzeczywisty czas weryfikacji kryptograficznej podpisów |
+| **Makro** | sieć P2P (500–4000 węzłów) | czas propagacji bloku w sieci i liczbę bloków osieroconych |
 
-   **Analiza Danych:** Python 3 (Pandas, Matplotlib) – przetwarzanie logów i generowanie wykresów statystycznych.
+Wynik z etapu mikro (czas weryfikacji) zasila etap makro, dzięki czemu oba
+tworzą jeden, spójny zestaw danych. Każdy scenariusz uruchamiano wielokrotnie
+dla różnych ziaren losowości, a wyniki uśredniano.
 
-   **Środowisko:** Ubuntu Linux / Oracle VirtualBox.
+Porównano trzy schematy podpisu:
 
-## 📊 Metodyka Badań
+- **ECDSA** — klasyczny algorytm referencyjny (podpis ~64 B),
+- **Dilithium2 (ML-DSA-44)** — standard PQC oparty na kratach (podpis ~2,4 KB),
+- **SPHINCS+ (SLH-DSA)** — schemat oparty na funkcjach skrótu (podpis >7,8 KB).
 
-Eksperymenty zostały podzielone na dwa główne nurty:
+## Najważniejsze wyniki
 
-   **Testy na realnym węźle (Substrate)**: Pomiar czasu weryfikacji bloków o rozmiarach 5MB, 10MB oraz 20MB.
+Dla największego badanego obciążenia (2000 transakcji, sieć 4000 węzłów):
 
-   **Symulacje sieciowe (SimBlock)**: Badanie czasu rozchodzenia się informacji w topologii P2P przy założeniu narzutu danych generowanego przez podpisy PQC.
+| Algorytm | Śr. czas propagacji | Bloki osierocone |
+|----------|--------------------:|-----------------:|
+| ECDSA | ~11 s | ~150 |
+| Dilithium2 (ML-DSA-44) | ~86 s | ~63 800 |
+| SPHINCS+ (SLH-DSA) | ~180 s | ~569 000 |
 
-   Przygotowanie danych o rozmiarach:
-   
-Na podstawie literatury (np. dokumentacji NIST) przyjęto parametry dla 128-bitowego poziomu bezpieczeństwa:
+**Wnioski:**
 
-    Ed25519 (Klasyczny): Podpis: 64 B, Klucz publiczny: 32 B.
+- Głównym czynnikiem ograniczającym skalowalność jest **przepustowość sieci**,
+  a nie moc obliczeniowa — udział czasu weryfikacji CPU w całkowitym opóźnieniu
+  nie przekracza kilku procent.
+- **ECDSA** ma najniższy narzut, lecz przy większych obciążeniach również
+  przekracza przyjęty próg bezpiecznej propagacji (6 s).
+- **Dilithium2** jest praktyczny tylko przy niskich obciążeniach lub wymaga
+  dodatkowych mechanizmów (kompresja, agregacja transakcji).
+- **SPHINCS+**, ze względu na rozmiar podpisu, w żadnym scenariuszu nie
+  utrzymuje bezpiecznej propagacji i prowadzi do masowego powstawania bloków
+  osieroconych (załamanie sieci — *congestion collapse*).
 
-    Dilithium2 (PQC): Podpis: 2420 B, Klucz publiczny: 1312 B.
+## Wykorzystane narzędzia
 
-    SPHINCS+-128f (PQC): Podpis: 17088 B, Klucz publiczny: 32 B.
+- **Rust** (biblioteki `pqcrypto-dilithium`, `pqcrypto-sphincsplus`, `secp256k1`)
+  — pomiar narzutu kryptograficznego,
+- **SimBlock** (Java) — symulator propagacji bloków w sieci blockchain,
+- **Python** (`pandas`, `numpy`, `matplotlib`) — analiza danych i wizualizacja.
 
-Wyliczenie narzutu na blok (Overhead):
-Załóżmy, że blok zawiera 500 transakcji. Obliczamy całkowity rozmiar danych podpisów w bloku:
+## Terminologia
 
-    Klasyczny: 500×96 B≈0.048 MB.
+Nazwy robocze nie są w pełni tożsame ze standardami NIST:
 
-    Dilithium: 500×3.7 KB≈1.8 MB.
+| Nazwa robocza | Standard NIST | Badany wariant |
+|---------------|---------------|----------------|
+| Dilithium2 | ML-DSA (FIPS 204) | ML-DSA-44 |
+| SPHINCS+ | SLH-DSA (FIPS 205) | SLH-DSA-SHA2-128s |
 
-    SPHINCS+: 500×17 KB≈8.5 MB.
+## Licencja
 
-## Autorka:
-**_Anna Tkach_ _2026_**
+Do uzupełnienia przez autora. Symulator SimBlock rozwijany jest na osobnej
+licencji — zob. [repozytorium SimBlock](https://github.com/dsg-titech/simblock).
