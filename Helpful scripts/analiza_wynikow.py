@@ -54,26 +54,28 @@ KATALOG_WYNIKI = "wyniki"          # gdzie leżą pliki .txt z run_all.sh
 KATALOG_WYKRESY = "wykresy"        # gdzie zapisać wykresy
 PROG_SEKUNDY = 6.0                 # próg bezpiecznej propagacji [s]
 
-# Parametry scenariuszy (te same, których używałaś). Klucz: (algorytm, tx).
-# Wartości: BLOCK_SIZE [B], czas weryfikacji CPU [ms] (z etapu mikro w Rust).
+# Parametry scenariuszy. Klucz: (algorytm, tx).
+# Wartosci: BLOCK_SIZE [B] (bez zmian - zalezy od rozmiaru podpisu) oraz
+# verif_ms = MEDIANA czasu weryfikacji [ms] z powtorzonych mikrotestow Rust
+# (30-50 powtorzen). Uzywane do kolumny "Udzial weryfikacji CPU %".
 SCENARIUSZE = {
-    ("ecdsa", 500):      {"block_size": 125000,   "verif_ms": 59},
-    ("ecdsa", 1000):     {"block_size": 250000,   "verif_ms": 141},
-    ("ecdsa", 1500):     {"block_size": 375000,   "verif_ms": 217},
-    ("ecdsa", 2000):     {"block_size": 500000,   "verif_ms": 255},
-    ("dilithium", 500):  {"block_size": 1941000,  "verif_ms": 111},
-    ("dilithium", 1000): {"block_size": 3882000,  "verif_ms": 114},
-    ("dilithium", 1500): {"block_size": 5823000,  "verif_ms": 253},
-    ("dilithium", 2000): {"block_size": 7764000,  "verif_ms": 233},
-    ("sphincs", 500):    {"block_size": 4019000,  "verif_ms": 1514},
-    ("sphincs", 1000):   {"block_size": 8038000,  "verif_ms": 3267},
-    ("sphincs", 1500):   {"block_size": 12057000, "verif_ms": 3881},
-    ("sphincs", 2000):   {"block_size": 16076000, "verif_ms": 5105},
+    ("ecdsa", 500):      {"block_size": 125000,   "verif_ms": 33},
+    ("ecdsa", 1000):     {"block_size": 250000,   "verif_ms": 65},
+    ("ecdsa", 1500):     {"block_size": 375000,   "verif_ms": 110},
+    ("ecdsa", 2000):     {"block_size": 500000,   "verif_ms": 161},
+    ("dilithium", 500):  {"block_size": 1941000,  "verif_ms": 40},
+    ("dilithium", 1000): {"block_size": 3882000,  "verif_ms": 75},
+    ("dilithium", 1500): {"block_size": 5823000,  "verif_ms": 129},
+    ("dilithium", 2000): {"block_size": 7764000,  "verif_ms": 135},
+    ("sphincs", 500):    {"block_size": 4019000,  "verif_ms": 1141},
+    ("sphincs", 1000):   {"block_size": 8038000,  "verif_ms": 2282},
+    ("sphincs", 1500):   {"block_size": 12057000, "verif_ms": 3410},
+    ("sphincs", 2000):   {"block_size": 16076000, "verif_ms": 4938},
 }
 
 # Ładne nazwy algorytmów do tytułów wykresów/tabel
-NAZWA_ALGO = {"ecdsa": "ECDSA", "dilithium": "Dilithium2 (ML-DSA-44)",
-              "sphincs": "SPHINCS+ (SLH-DSA)"}
+NAZWA_ALGO = {"ecdsa": "ECDSA", "dilithium": "Dilithium2",
+              "sphincs": "SPHINCS+"}
 
 # ---------------------------------------------------------------------------
 # 1. PARSOWANIE POJEDYNCZEGO PLIKU LOGÓW  (jedyne miejsce zależne od formatu)
@@ -132,38 +134,60 @@ def wczytaj_bloki_z_pliku(sciezka):
     return bloki
 
 
-def statystyki_z_pliku(sciezka):
+def statystyki_z_pliku(sciezka, prog_pokrycia=0.90):
     """
-    Z jednego pliku liczy statystyki propagacji [w SEKUNDACH]:
-        liczba_blokow, mean, std, min, max, orphan
-    gdzie:
-        - czas propagacji bloku = (max t - min t) wśród odbiorców tego bloku,
-        - mean/std/min/max liczone po wszystkich blokach (w sekundach),
-        - liczba_blokow = liczba zarejestrowanych bloków,
-        - orphan = liczba bloków osieroconych = ile bloków powstało PONAD
-          liczbę odrębnych wysokości (czyli ile było forków na powtórzonych
-          wysokościach).
+    Z jednego pliku liczy statystyki propagacji [w SEKUNDACH].
+
+    KLUCZOWE: Mean/Std/Min/Max liczone są TYLKO po blokach, które dotarły
+    do znaczącej części sieci (domyślnie >= 90% węzłów). Bloki osierocone
+    (orphany), które docierają tylko do garstki węzłów, są z tej statystyki
+    WYKLUCZONE — inaczej przy dużym obciążeniu tysiące "martwych" forków
+    (docierających do 2-3 węzłów w ułamku sekundy) sztucznie zaniżyłyby
+    średni czas propagacji, dając fizycznie absurdalny wynik (Mean maleje,
+    gdy blok rośnie). Liczba orphanów jest raportowana OSOBNO.
+
+    Zwraca:
+        liczba_blokow  - wszystkie zarejestrowane bloki (łańcuch + forki),
+        mean/std/min/max - czas propagacji [s] liczony po blokach docierających
+                           do >= prog_pokrycia * (rozmiar sieci) węzłów,
+        orphan         - liczba bloków osieroconych (forki na powtórzonych
+                         wysokościach).
     Zwraca None, jeśli plik nie zawiera poprawnych danych.
     """
     bloki = wczytaj_bloki_z_pliku(sciezka)
     if not bloki:
         return None
 
-    czasy_prop_s = []      # czas propagacji każdego bloku [s]
+    # rozmiar sieci = najwieksza liczba odbiorcow spotkana w pliku
+    # (blok glownego lancucha dociera do calej sieci)
+    max_odbiorcow = max((len(b["recv"]) for b in bloki), default=0)
+    if max_odbiorcow == 0:
+        return None
+    prog_wezlow = prog_pokrycia * max_odbiorcow
+
+    czasy_prop_s = []      # czas propagacji bloków docierających do wiekszosci sieci
     wysokosci = []
     for b in bloki:
         ts = [t for _, t in b["recv"]]
-        if len(ts) >= 2:
+        # licz czas propagacji tylko dla blokow docierajacych do >= progu sieci
+        if len(ts) >= 2 and len(ts) >= prog_wezlow:
             czasy_prop_s.append((max(ts) - min(ts)) / 1000.0)
         if b["height"] is not None:
             wysokosci.append(b["height"])
 
-    if not czasy_prop_s:
-        return None
-
     liczba_blokow = len(bloki)
     liczba_wysokosci = len(set(wysokosci)) if wysokosci else liczba_blokow
     orphan = max(0, liczba_blokow - liczba_wysokosci)
+
+    # jesli zaden blok nie dotarl do wiekszosci sieci (skrajny congestion
+    # collapse), sygnalizujemy to Mean = None -> w tabeli pojawi sie "brak
+    # propagacji" zamiast falszywej malej wartosci
+    if not czasy_prop_s:
+        return {
+            "liczba_blokow": liczba_blokow,
+            "mean": None, "std": None, "min": None, "max": None,
+            "orphan": orphan,
+        }
 
     return {
         "liczba_blokow": liczba_blokow,
@@ -338,15 +362,24 @@ def usrednij(zebrane):
     wynik = {}
     for klucz, d in zebrane.items():
         n_seedow = len(d["mean"])
+        # odfiltruj seedy, dla ktorych nie dalo sie policzyc Mean (None)
+        # = skrajny congestion collapse, zaden blok nie dotarl do wiekszosci sieci
+        means_ok = [m for m in d["mean"] if m is not None]
+        stds_ok = [s for s in d["std"] if s is not None]
+        mins_ok = [m for m in d["min"] if m is not None]
+        maxs_ok = [m for m in d["max"] if m is not None]
+        n_ok = len(means_ok)
+
         wynik[klucz] = {
             "liczba_blokow": int(round(np.mean(d["liczba_blokow"]))),
-            "mean": float(np.mean(d["mean"])),
-            "std": float(np.mean(d["std"])),   # średnia z wewn. Std
-            "min": float(np.min(d["min"])),
-            "max": float(np.max(d["max"])),
+            "mean": float(np.mean(means_ok)) if means_ok else None,
+            "std": float(np.mean(stds_ok)) if stds_ok else None,
+            "min": float(np.min(mins_ok)) if mins_ok else None,
+            "max": float(np.max(maxs_ok)) if maxs_ok else None,
             "orphan": int(round(np.mean(d["orphan"]))),
-            "mean_std_seedy": float(np.std(d["mean"])) if n_seedow > 1 else 0.0,
+            "mean_std_seedy": float(np.std(means_ok)) if n_ok > 1 else 0.0,
             "n_seedow": n_seedow,
+            "n_seedow_z_propagacja": n_ok,
         }
     return wynik
 
@@ -380,6 +413,12 @@ def zapisz_tabele_skalowalnosc(dane):
                         w.writerow([N, "brak", "brak", "brak", "brak",
                                     "brak", "brak", "brak"])
                         continue
+                    if d["mean"] is None:
+                        # skrajny congestion collapse - brak blokow docierajacych
+                        # do wiekszosci sieci
+                        w.writerow([N, d["liczba_blokow"], d["orphan"],
+                                    "brak propagacji", "-", "-", "-", "-"])
+                        continue
                     w.writerow([
                         N, d["liczba_blokow"], d["orphan"],
                         f'{d["mean"]:.3f}', f'{d["std"]:.3f}',
@@ -412,7 +451,10 @@ def zapisz_tabele_udzial_cpu(dane):
                     if not d:
                         w.writerow([N, f"{verif_s:.3f}", "brak", "brak"])
                         continue
-                    udzial = 100.0 * verif_s / d["mean"] if d["mean"] > 0 else 0.0
+                    if d["mean"] is None or d["mean"] <= 0:
+                        w.writerow([N, f"{verif_s:.3f}", "brak propagacji", "-"])
+                        continue
+                    udzial = 100.0 * verif_s / d["mean"]
                     w.writerow([
                         N, f"{verif_s:.3f}", f'{d["mean"]:.3f}', f'{udzial:.2f}',
                     ])
@@ -437,6 +479,16 @@ def opis_scenariuszy(algo):
     return "\n".join(linie)
 
 
+def opis_scenariuszy_1linia(algo):
+    """Wersja jednoliniowa (do podpisu pod wykresem)."""
+    czesci = []
+    for tx in LICZBY_TX:
+        s = SCENARIUSZE[(algo, tx)]
+        bs_mb = s["block_size"] / 1_000_000
+        czesci.append(f"{tx} tx: {bs_mb:.2f} MB / {s['verif_ms']} ms")
+    return "Rozmiar bloku / czas weryfikacji CPU:   " + "    •    ".join(czesci)
+
+
 def rysuj_propagacje(dane):
     os.makedirs(KATALOG_WYKRESY, exist_ok=True)
     for algo in ALGORYTMY:
@@ -448,7 +500,7 @@ def rysuj_propagacje(dane):
             xs, ys, errs = [], [], []
             for i, N in enumerate(ROZMIARY_N):
                 d = dane.get((algo, tx, N))
-                if d:
+                if d and d["mean"] is not None:
                     xs.append(i)
                     ys.append(d["mean"])
                     errs.append(d["mean_std_seedy"])
@@ -471,15 +523,18 @@ def rysuj_propagacje(dane):
                      f"(uśrednione z {n_seedow} ziaren losowości; "
                      f"słupki błędów = odchylenie między seedami)")
         ax.grid(True, linestyle=":", alpha=0.6)
-        ax.legend(title="Obciążenie bloku", fontsize=9)
+        # legenda w najlepszym wolnym miejscu (matplotlib sam dobiera)
+        ax.legend(title="Obciążenie bloku", fontsize=9, loc="best")
         ax.set_ylim(bottom=0)
 
-        # ramka z opisem scenariuszy (block_size + opóźnienie)
-        ax.text(0.02, 0.98, opis_scenariuszy(algo), transform=ax.transAxes,
-                fontsize=8, va="top", ha="left",
-                bbox=dict(boxstyle="round", facecolor="white", alpha=0.8))
+        # ramka z opisem scenariuszy (block_size + opóźnienie) UMIESZCZONA
+        # POD wykresem, żeby nie kolidowała z legendą ani z krzywymi
+        fig.subplots_adjust(bottom=0.20)
+        fig.text(0.5, 0.02, opis_scenariuszy_1linia(algo),
+                 fontsize=7.5, va="bottom", ha="center",
+                 bbox=dict(boxstyle="round", facecolor="white",
+                           edgecolor="gray", alpha=0.9))
 
-        fig.tight_layout()
         nazwa = os.path.join(KATALOG_WYKRESY, f"propagacja_{algo}.png")
         fig.savefig(nazwa, dpi=150)
         plt.close(fig)
@@ -538,7 +593,7 @@ def rysuj_osierocone(dane):
 # MAIN
 # ---------------------------------------------------------------------------
 
-WERSJA_SKRYPTU = "2024-v3 (parser SimBlock + wykrywanie N + diagnostyka)"
+WERSJA_SKRYPTU = "2026-v5 (Mean tylko dla blokow docierajacych do >=90% sieci; orphany osobno)"
 
 
 def diagnostyka(zebrane, dane):
@@ -563,7 +618,8 @@ def diagnostyka(zebrane, dane):
     print(f"    kombinacji z danymi: {wypelnione} / 60   (pustych: {puste})")
 
     # sprawdź, czy wszystkie Mean są identyczne
-    wszystkie_mean = [round(d["mean"], 3) for d in dane.values()]
+    wszystkie_mean = [round(d["mean"], 3) for d in dane.values()
+                      if d["mean"] is not None]
     if len(wszystkie_mean) > 1 and len(set(wszystkie_mean)) == 1:
         print("    !!! OSTRZEŻENIE: wszystkie wartości Mean są IDENTYCZNE.")
         print("        Najczęstsze przyczyny:")
