@@ -1,0 +1,2 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+RPC,submit_pqc_signature_sphincs,"SubstrateRequestException({'code': 1016, 'message': 'Immediately Dropped', 'data': ""The transaction couldn't enter the pool because of the limit""})",1,2026-09-20T23:32:05Z,2026-09-20T23:32:05Z
