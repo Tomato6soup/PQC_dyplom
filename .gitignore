@@ -1,0 +1,7 @@
+load_testing/__pycache__/
+load_testing/results/tmp_*
+load_testing/results/quicktest_*
+load_testing/results/smoketest*
+load_testing/results/diag_*
+load_testing/results/node_logs/
+load_testing/results/*.log

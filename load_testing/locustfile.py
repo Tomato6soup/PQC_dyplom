@@ -1,37 +1,71 @@
-import time
 import os
 import json
-from locust import HttpUser, task, between, events
-import urllib3
+import time
+import threading
 
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+from locust import User, task, between, events
+from substrateinterface import SubstrateInterface, Keypair
 
-
-# ECDSA: overhead ~96 B
-# Dilithium2: overhead ~3732 B (2420 B podpis + 1312 B klucz)
-# SPHINCS+-128f: overhead ~17120 B (17088 B podpis + 32 B klucz)
+ALGO_MAP = {"ecdsa": 0, "dilithium2": 1, "sphincs": 2}
 ALGO = os.getenv("TEST_ALGO", "dilithium2").lower()
+ALGO_ID = ALGO_MAP.get(ALGO, 1)
 
-PAYLOAD_SIZES = {
-    "ecdsa": 96,
-    "dilithium2": 3732,
-    "sphincs": 17120
-}
+VECTORS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pqc_test_vectors.json")
+with open(VECTORS_PATH) as f:
+    VECTORS = json.load(f)
 
-DATA_CHUNK = b"X" * PAYLOAD_SIZES.get(ALGO, 3732)
+VEC = VECTORS[ALGO]
+MESSAGE_HEX = "0x" + VECTORS["message"]
+SIGNATURE_HEX = "0x" + VEC["signature"]
+PUBLIC_KEY_HEX = "0x" + VEC["public_key"]
 
-class SubstrateLoadUser(HttpUser):
-    wait_time = between(0.001, 0.005)  
+substrate = SubstrateInterface(url="ws://127.0.0.1:9944")
+keypair = Keypair.create_from_uri("//Alice")
+
+_nonce_lock = threading.Lock()
+_current_nonce = substrate.get_account_nonce(keypair.ss58_address)
+
+def _next_nonce():
+    global _current_nonce
+    with _nonce_lock:
+        n = _current_nonce
+        _current_nonce += 1
+        return n
+
+class SubstrateLoadUser(User):
+    wait_time = between(0.001, 0.005)
 
     @task
-    def submit_extrinsic(self):
-        # Symulacja wysyłania transakcji/ekstrinsiku do węzła przez RPC JSON-RPC
-        payload = {
-            "jsonrpc": "2.0",
-            "id": 1,
-            "method": "author_submitExtrinsic",
-            "params": [DATA_CHUNK.hex()]
-        }
-        headers = {"Content-Type": "application/json"}
-        self.client.post("/", json=payload, headers=headers, name=f"submit_tx_{ALGO}")
-
+    def submit_pqc_signature(self):
+        start = time.time()
+        nonce = _next_nonce()
+        try:
+            call = substrate.compose_call(
+                call_module="PqcBench",
+                call_function="submit_pqc_signature",
+                call_params={
+                    "algo": ALGO_ID,
+                    "message": MESSAGE_HEX,
+                    "signature": SIGNATURE_HEX,
+                    "public_key": PUBLIC_KEY_HEX,
+                }
+            )
+            extrinsic = substrate.create_signed_extrinsic(call=call, keypair=keypair, nonce=nonce)
+            substrate.submit_extrinsic(extrinsic, wait_for_inclusion=False)
+            elapsed_ms = (time.time() - start) * 1000
+            events.request.fire(
+                request_type="RPC",
+                name=f"submit_pqc_signature_{ALGO}",
+                response_time=elapsed_ms,
+                response_length=len(SIGNATURE_HEX),
+                exception=None,
+            )
+        except Exception as e:
+            elapsed_ms = (time.time() - start) * 1000
+            events.request.fire(
+                request_type="RPC",
+                name=f"submit_pqc_signature_{ALGO}",
+                response_time=elapsed_ms,
+                response_length=0,
+                exception=e,
+            )

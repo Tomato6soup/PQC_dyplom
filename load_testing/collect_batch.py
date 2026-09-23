@@ -4,6 +4,7 @@ import requests
 import pandas as pd
 import os
 import csv
+import sys
 
 RESULTS_DIR = os.path.expanduser("~/PQC_dyplom/load_testing/results")
 os.makedirs(RESULTS_DIR, exist_ok=True)
@@ -12,14 +13,26 @@ PROMETHEUS_URL = "http://localhost:9090/api/v1/query"
 RPC_URL = "http://127.0.0.1:9944"
 
 scenarios = [
+    {"users": 10, "rate": 2, "label": "Niski"},
+    {"users": 50, "rate": 10, "label": "Sredni-1"},
+    {"users": 100, "rate": 20, "label": "Sredni-2"},
+    {"users": 200, "rate": 35, "label": "Przejsciowy"},
     {"users": 300, "rate": 50, "label": "Nasycenie"},
+    {"users": 400, "rate": 55, "label": "Przeciazenie-1"},
+    {"users": 500, "rate": 65, "label": "Przeciazenie-2"},
+    {"users": 600, "rate": 75, "label": "Przeciazenie-3"}
 ]
-algorithms = ["sphincs"]
+
+if len(sys.argv) < 2 or sys.argv[1] not in ["ecdsa", "dilithium2", "sphincs"]:
+    print("Uzycie: python3 collect_batch.py <ecdsa|dilithium2|sphincs>")
+    sys.exit(1)
+
+algorithms = [sys.argv[1]]
 
 DURATION_CONFIGS = [
-    {"duration": "30s", "duration_s": 30, "repeats": 1},
-    {"duration": "60s", "duration_s": 60, "repeats": 1},
-    {"duration": "90s", "duration_s": 90, "repeats": 1},
+    {"duration": "30s", "duration_s": 30, "repeats": 5},
+    {"duration": "60s", "duration_s": 60, "repeats": 5},
+    {"duration": "90s", "duration_s": 90, "repeats": 5},
 ]
 
 
@@ -92,25 +105,25 @@ def wait_for_pool_drain(max_wait_s=30, poll_interval_s=1.0, stable_checks=3):
         if pending is not None and len(pending) == 0:
             stable += 1
             if stable >= stable_checks:
-                return True, waited
+                return True
         else:
             stable = 0
         time.sleep(poll_interval_s)
         waited += poll_interval_s
-    return False, waited
+    return False
 
 
-def wait_for_finality_catchup(max_wait_s=90, poll_interval_s=0.5):
+def wait_for_finality_catchup(max_wait_s=15, poll_interval_s=0.5):
     waited = 0.0
     while waited < max_wait_s:
         best_num = get_best_block_number()
         finalized = get_finalized_block_number()
         if best_num is not None and finalized is not None:
             if best_num - finalized <= 1:
-                return True, waited
+                return True
         time.sleep(poll_interval_s)
         waited += poll_interval_s
-    return False, waited
+    return False
 
 
 def measure_chain_tps(start_block, end_block, elapsed_s):
@@ -124,11 +137,14 @@ def measure_chain_tps(start_block, end_block, elapsed_s):
     return total_extrinsics / elapsed_s
 
 
-RAW_CSV_PATH = os.path.join(RESULTS_DIR, "surowe_proby_quicktest.csv")
+RAW_CSV_PATH = os.path.join(RESULTS_DIR, "surowe_proby_pelne.csv")
 RAW_CSV_FIELDS = [
     "Algorytm", "Uzytkownicy", "Poziom", "Czas_testu_s", "Powtorzenie",
     "RPS", "TPS", "Mediana_ms", "P95_ms", "P99_ms", "CPU_%", "RAM_MB", "Failures"
 ]
+
+if os.path.exists(RAW_CSV_PATH):
+    print(f"UWAGA: {RAW_CSV_PATH} juz istnieje - nowe wyniki beda DOPISYWANE do niego.")
 
 
 def append_raw_record(record):
@@ -142,10 +158,8 @@ def append_raw_record(record):
         os.fsync(f.fileno())
 
 
-raw_records = []
 total_runs = len(algorithms) * len(scenarios) * sum(dc["repeats"] for dc in DURATION_CONFIGS)
-print(f"=== SZYBKI TEST KONTROLNY ({total_runs} przebiegi: SPHINCS+, u=300, 30s/60s/90s) ===")
-print(f"Zapis na biezaco do: {RAW_CSV_PATH}\n")
+print(f"=== PARTIA: {algorithms[0]} ({total_runs} przebiegow) ===")
 current_run = 0
 
 for algo in algorithms:
@@ -161,8 +175,11 @@ for algo in algorithms:
 
             for rep in range(1, repeats + 1):
                 current_run += 1
-                prefix = os.path.join(RESULTS_DIR, f"quicktest_{algo}_u{u}_t{test_duration_s}_rep{rep}")
-                print(f"[{current_run}/{total_runs}] Algo: {algo:10s} | U={u:3d} ({lbl}) | T={test_duration}")
+                prefix = os.path.join(
+                    RESULTS_DIR, f"tmp_{algo}_u{u}_t{test_duration_s}_rep{rep}"
+                )
+                print(f"[{current_run}/{total_runs}] Algo: {algo:10s} | U={u:3d} ({lbl}) | "
+                      f"T={test_duration:4s} | Proba {rep}/{repeats}", flush=True)
 
                 cmd = [
                     "locust", "-f", "locustfile.py",
@@ -175,30 +192,19 @@ for algo in algorithms:
 
                 start_block = get_finalized_block_number()
                 t_start = time.time()
-                print(f"  Start bloku: {start_block}", flush=True)
 
                 subprocess.run(cmd, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
                 t_end = time.time()
-                print("  Test locust zakonczony.", flush=True)
 
-                # CPU/RAM mierzone TU, zaraz po tescie - nie po oczekiwaniu na
-                # finalizacje, zeby okno rate() lapalo sam test a nie bezczynnosc.
                 cpu = get_metric(f'100 - (avg(rate(node_cpu_seconds_total{{mode="idle"}}[{test_duration}])) * 100)')
                 ram = get_metric('(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / (1024 * 1024)')
-                print(f"  CPU: {cpu:.2f}%  RAM: {ram:.0f}MB", flush=True)
 
-                print("  Czekam na drain puli...", flush=True)
-                drained, wait_drain_s = wait_for_pool_drain()
-                print(f"  Pula oprozniona: {drained} (po {wait_drain_s:.1f}s)", flush=True)
-
-                caught_up, wait_finality_s = wait_for_finality_catchup()
-                print(f"  Finalizacja dogonila: {caught_up} (po {wait_finality_s:.1f}s)", flush=True)
+                wait_for_pool_drain()
+                wait_for_finality_catchup()
 
                 end_block = get_finalized_block_number()
-                print(f"  Koniec bloku: {end_block}", flush=True)
                 chain_tps = measure_chain_tps(start_block, end_block, t_end - t_start)
-                print(f"  Chain TPS: {chain_tps:.2f}", flush=True)
 
                 stats_file = f"{prefix}_stats.csv"
                 if os.path.exists(stats_file):
@@ -219,17 +225,9 @@ for algo in algorithms:
                         "RAM_MB": ram,
                         "Failures": int(agg["Failure Count"])
                     }
-                    raw_records.append(record)
                     append_raw_record(record)
-                    print(f"  Zapisano rekord (RPS={record['RPS']:.1f}, "
-                          f"P95={record['P95_ms']:.0f}ms, P99={record['P99_ms']:.0f}ms, "
-                          f"CPU={record['CPU_%']:.1f}%, RAM={record['RAM_MB']:.0f}MB)\n", flush=True)
                 else:
-                    print(f"  UWAGA: brak pliku {stats_file} - Locust mogl sie nie uruchomic poprawnie\n", flush=True)
-
+                    print(f"  UWAGA: brak {stats_file}", flush=True)
                 time.sleep(2)
 
-df_raw = pd.read_csv(RAW_CSV_PATH)
-print("=== WYNIKI SZYBKIEGO TESTU ===")
-print(df_raw.to_string(index=False))
-print(f"\nSZYBKI TEST ZAKONCZONY. Wyniki w: {RAW_CSV_PATH}")
+print(f"\nPARTIA {algorithms[0]} ZAKONCZONA.")

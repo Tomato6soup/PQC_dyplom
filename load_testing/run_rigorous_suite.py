@@ -4,6 +4,7 @@ import requests
 import pandas as pd
 import numpy as np
 import os
+import csv
 import math
 import matplotlib.pyplot as plt
 
@@ -22,16 +23,21 @@ scenarios = [
     {"users": 150, "rate": 25, "label": "Szczyt"},
     {"users": 200, "rate": 35, "label": "Przejsciowy"},
     {"users": 300, "rate": 50, "label": "Nasycenie"},
-    {"users": 450, "rate": 60, "label": "Przeciazenie"}
+    {"users": 400, "rate": 55, "label": "Przeciazenie-1"},
+    {"users": 500, "rate": 65, "label": "Przeciazenie-2"},
+    {"users": 600, "rate": 75, "label": "Przeciazenie-3"}
 ]
 
 algorithms = ["ecdsa", "dilithium2", "sphincs"]
 tx_crypto_size = {"ecdsa": 96, "dilithium2": 3732, "sphincs": 17120}
 crypto_verify_time_ms = {"ecdsa": 0.06, "dilithium2": 0.04, "sphincs": 1.25}
 
-TEST_DURATION = "60s"
-TEST_DURATION_S = 60
-REPEATS = 5
+DURATION_CONFIGS = [
+    {"duration": "30s", "duration_s": 30, "repeats": 5},
+    {"duration": "60s", "duration_s": 60, "repeats": 5},
+    {"duration": "90s", "duration_s": 90, "repeats": 5},
+]
+PRIMARY_DURATION_S = 60
 
 NETWORK_SCALING_COEFF = 0.08
 
@@ -94,16 +100,10 @@ def count_extrinsics_in_block(block_number, exclude_inherents=True):
     extrinsics = block.get("block", {}).get("extrinsics", [])
     if not exclude_inherents:
         return len(extrinsics)
-    # Kazdy blok w tym runtime ma dokladnie jeden obowiazkowy inherent
-    # (Timestamp.set), ktory nie jest realna transakcja uzytkownika.
-    return max(0, len(extrinsics) - 1)
+    return max(0, len(extrinsics) - 1)  # -1: pomija obowiazkowy inherent Timestamp.set
 
 
 def wait_for_pool_drain(max_wait_s=30, poll_interval_s=1.0, stable_checks=3):
-    """Czeka az pula transakcji (author_pendingExtrinsics) oprozni sie
-    i pozostanie pusta przez `stable_checks` kolejnych sprawdzen, albo
-    do uplywu max_wait_s (zabezpieczenie przed zawieszeniem przy realnym
-    zatorze, ktorego nie da sie juz odrobic w rozsadnym czasie)."""
     stable = 0
     waited = 0.0
     while waited < max_wait_s:
@@ -119,10 +119,7 @@ def wait_for_pool_drain(max_wait_s=30, poll_interval_s=1.0, stable_checks=3):
     return False
 
 
-def wait_for_finality_catchup(max_wait_s=30, poll_interval_s=0.5):
-    """Czeka az finalized head dogoni best head (lub do uplywu max_wait_s),
-    zeby get_finalized_block_number() nie ucinal transakcji, ktore juz sa
-    w best-block, ale jeszcze nie zostaly sfinalizowane przez GRANDPA."""
+def wait_for_finality_catchup(max_wait_s=90, poll_interval_s=0.5):
     waited = 0.0
     while waited < max_wait_s:
         best_num = get_best_block_number()
@@ -146,10 +143,38 @@ def measure_chain_tps(start_block, end_block, elapsed_s):
     return total_extrinsics / elapsed_s
 
 
+RAW_CSV_PATH = os.path.join(RESULTS_DIR, "surowe_proby_pelne.csv")
+RAW_CSV_FIELDS = [
+    "Algorytm", "Uzytkownicy", "Poziom", "Czas_testu_s", "Powtorzenie",
+    "RPS", "TPS", "Mediana_ms", "P95_ms", "P99_ms", "CPU_%", "RAM_MB", "Failures"
+]
+
+if os.path.exists(RAW_CSV_PATH):
+    print(f"UWAGA: {RAW_CSV_PATH} juz istnieje - nowe wyniki beda DOPISYWANE do niego.")
+    print("Jesli chcesz zaczac zupelnie od zera, usun ten plik przed uruchomieniem skryptu.")
+
+
+def append_raw_record(record):
+    file_exists = os.path.exists(RAW_CSV_PATH)
+    with open(RAW_CSV_PATH, "a", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=RAW_CSV_FIELDS)
+        if not file_exists:
+            writer.writeheader()
+        writer.writerow(record)
+        f.flush()
+        os.fsync(f.fileno())
+
+
 raw_records = []
 
-print(f"=== ETAP 1: TESTY OBCIAZENIOWE WEZLA RPC (k={REPEATS} POWTORZEN) ===")
-total_runs = len(algorithms) * len(scenarios) * REPEATS
+total_runs = sum(
+    len(algorithms) * len(scenarios) * dc["repeats"] for dc in DURATION_CONFIGS
+)
+print(f"=== ETAP 1: TESTY OBCIAZENIOWE WEZLA RPC ({total_runs} PRZEBIEGOW LACZNIE) ===")
+print("Warianty czasu trwania: " + ", ".join(
+    f"{dc['duration']} (k={dc['repeats']})" for dc in DURATION_CONFIGS
+))
+print(f"Wyniki kazdego przebiegu beda dopisywane na biezaco do: {RAW_CSV_PATH}")
 current_run = 0
 
 for algo in algorithms:
@@ -158,69 +183,77 @@ for algo in algorithms:
         r = sc["rate"]
         lbl = sc["label"]
 
-        for rep in range(1, REPEATS + 1):
-            current_run += 1
-            prefix = os.path.join(RESULTS_DIR, f"tmp_{algo}_u{u}_rep{rep}")
-            print(f"[{current_run}/{total_runs}] Algo: {algo:10s} | U={u:3d} ({lbl}) | Proba {rep}/{REPEATS}")
+        for dc in DURATION_CONFIGS:
+            test_duration = dc["duration"]
+            test_duration_s = dc["duration_s"]
+            repeats = dc["repeats"]
 
-            cmd = [
-                "locust", "-f", "locustfile.py",
-                "--headless", "-u", str(u), "-r", str(r),
-                "-t", TEST_DURATION, "--host", RPC_URL,
-                f"--csv={prefix}"
-            ]
-            env = os.environ.copy()
-            env["TEST_ALGO"] = algo
+            for rep in range(1, repeats + 1):
+                current_run += 1
+                prefix = os.path.join(
+                    RESULTS_DIR, f"tmp_{algo}_u{u}_t{test_duration_s}_rep{rep}"
+                )
+                print(f"[{current_run}/{total_runs}] Algo: {algo:10s} | U={u:3d} ({lbl}) | "
+                      f"T={test_duration:4s} | Proba {rep}/{repeats}")
 
-            start_block = get_finalized_block_number()
-            t_start = time.time()
+                cmd = [
+                    "locust", "-f", "locustfile.py",
+                    "--headless", "-u", str(u), "-r", str(r),
+                    "-t", test_duration, "--host", RPC_URL,
+                    f"--csv={prefix}"
+                ]
+                env = os.environ.copy()
+                env["TEST_ALGO"] = algo
 
-            subprocess.run(cmd, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                start_block = get_finalized_block_number()
+                t_start = time.time()
 
-            t_end = time.time()
+                subprocess.run(cmd, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-            # Poczekaj az kolejka transakcji sie oprozni i finalizacja dogoni
-            # czolo lancucha, zanim zmierzymy end_block - inaczej pod duzym
-            # obciazeniem TPS jest sztucznie zanizany (transakcje wyslane pod
-            # koniec okna testowego moga jeszcze nie byc sfinalizowane).
-            wait_for_pool_drain()
-            wait_for_finality_catchup()
+                t_end = time.time()
 
-            end_block = get_finalized_block_number()
-            chain_tps = measure_chain_tps(start_block, end_block, t_end - t_start)
+                wait_for_pool_drain()
+                wait_for_finality_catchup()
 
-            time.sleep(1)
-            cpu = get_metric('100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[60s])) * 100)')
-            ram = get_metric('(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / (1024 * 1024)')
+                end_block = get_finalized_block_number()
+                chain_tps = measure_chain_tps(start_block, end_block, t_end - t_start)
 
-            stats_file = f"{prefix}_stats.csv"
-            if os.path.exists(stats_file):
-                df_stat = pd.read_csv(stats_file)
-                agg = df_stat[df_stat["Name"] == "Aggregated"].iloc[0]
-                raw_records.append({
-                    "Algorytm": algo,
-                    "Uzytkownicy": u,
-                    "Poziom": lbl,
-                    "Powtorzenie": rep,
-                    "RPS": float(agg["Requests/s"]),
-                    "TPS": chain_tps,
-                    "Mediana_ms": float(agg["50%"]),
-                    "P95_ms": float(agg["95%"]),
-                    "P99_ms": float(agg["99%"]),
-                    "CPU_%": cpu,
-                    "RAM_MB": ram,
-                    "Failures": int(agg["Failure Count"])
-                })
-            time.sleep(2)
+                time.sleep(1)
+                cpu = get_metric('100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[60s])) * 100)')
+                ram = get_metric('(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / (1024 * 1024)')
 
-df_raw = pd.DataFrame(raw_records)
-df_raw.to_csv(os.path.join(RESULTS_DIR, "surowe_proby_k5.csv"), index=False)
+                stats_file = f"{prefix}_stats.csv"
+                if os.path.exists(stats_file):
+                    df_stat = pd.read_csv(stats_file)
+                    agg = df_stat[df_stat["Name"] == "Aggregated"].iloc[0]
+                    record = {
+                        "Algorytm": algo,
+                        "Uzytkownicy": u,
+                        "Poziom": lbl,
+                        "Czas_testu_s": test_duration_s,
+                        "Powtorzenie": rep,
+                        "RPS": float(agg["Requests/s"]),
+                        "TPS": chain_tps,
+                        "Mediana_ms": float(agg["50%"]),
+                        "P95_ms": float(agg["95%"]),
+                        "P99_ms": float(agg["99%"]),
+                        "CPU_%": cpu,
+                        "RAM_MB": ram,
+                        "Failures": int(agg["Failure Count"])
+                    }
+                    raw_records.append(record)
+                    append_raw_record(record)
+                time.sleep(2)
+
+df_raw = pd.read_csv(RAW_CSV_PATH)
 
 summary_rows = []
-for (algo, u), grp in df_raw.groupby(["Algorytm", "Uzytkownicy"], sort=False):
+for (algo, u, t_s), grp in df_raw.groupby(["Algorytm", "Uzytkownicy", "Czas_testu_s"], sort=False):
     summary_rows.append({
         "Algorytm": algo,
         "Uzytkownicy": u,
+        "Czas_testu_s": t_s,
+        "Liczba_probek": len(grp),
         "RPS_mean": grp["RPS"].mean(),
         "RPS_std": grp["RPS"].std(),
         "RPS_median": grp["RPS"].median(),
@@ -241,15 +274,17 @@ for (algo, u), grp in df_raw.groupby(["Algorytm", "Uzytkownicy"], sort=False):
     })
 
 df_summary = pd.DataFrame(summary_rows)
-summary_csv = os.path.join(RESULTS_DIR, "obciazenie_zagesszczone_statystyka_k5.csv")
+summary_csv = os.path.join(RESULTS_DIR, "obciazenie_statystyka_pelna.csv")
 df_summary.to_csv(summary_csv, index=False)
-print(f"\nZapisano zagregowane wyniki z k={REPEATS} powtorzen do: {summary_csv}")
+print(f"\nZapisano zagregowane wyniki (wszystkie warianty czasu trwania) do: {summary_csv}")
+
+df_summary_primary = df_summary[df_summary["Czas_testu_s"] == PRIMARY_DURATION_S]
 
 print("\n=== ETAP 2: MODEL SKALOWALNOSCI P2P DLA DUZYCH SIECI ===")
 node_counts = [500, 1000, 1500, 2000, 3000, 4000]
 sim_rows = []
 
-df_u150 = df_summary[df_summary["Uzytkownicy"] == 150]
+df_u150 = df_summary_primary[df_summary_primary["Uzytkownicy"] == 150]
 
 for _, row in df_u150.iterrows():
     algo = row["Algorytm"]
@@ -284,7 +319,7 @@ for _, row in df_u150.iterrows():
         })
 
 df_sim = pd.DataFrame(sim_rows)
-sim_csv = os.path.join(RESULTS_DIR, "symulacja_duzej_sieci_k5.csv")
+sim_csv = os.path.join(RESULTS_DIR, "symulacja_duzej_sieci.csv")
 df_sim.to_csv(sim_csv, index=False)
 
 print("\n=== ETAP 3: GENEROWANIE WYKRESOW PUBLIKACYJNYCH ===")
@@ -293,17 +328,18 @@ algo_meta = {
     "dilithium2": {"name": "Dilithium2 (ML-DSA-44)", "color": "#1f77b4", "marker": "s"},
     "sphincs": {"name": "SPHINCS+-128f (SLH-DSA)", "color": "#d62728", "marker": "^"}
 }
+all_users = [sc["users"] for sc in scenarios]
 
 plt.figure(figsize=(9, 5.5))
 for a in algorithms:
-    sub = df_summary[df_summary["Algorytm"] == a]
+    sub = df_summary_primary[df_summary_primary["Algorytm"] == a]
     plt.errorbar(sub["Uzytkownicy"], sub["RPS_mean"], yerr=sub["RPS_std"],
                  label=algo_meta[a]["name"], color=algo_meta[a]["color"],
                  marker=algo_meta[a]["marker"], capsize=4, lw=2, markersize=6)
-plt.title(f"Przepustowosc zadan RPC (RPS) w funkcji obciazenia (k={REPEATS} powtorzen, $\\pm 1\\sigma$)", fontsize=11, pad=10)
+plt.title(f"Przepustowosc zadan RPC (RPS) w funkcji obciazenia (T={PRIMARY_DURATION_S}s, $\\pm 1\\sigma$)", fontsize=11, pad=10)
 plt.xlabel("Liczba wspolbieznych uzytkownikow (Locust)", fontsize=10)
 plt.ylabel("Przepustowosc zadan HTTP (RPS)", fontsize=10)
-plt.xticks([10, 50, 100, 150, 200, 300, 450])
+plt.xticks(all_users)
 plt.grid(True, ls="--", alpha=0.5)
 plt.legend(frameon=True)
 plt.tight_layout()
@@ -312,14 +348,14 @@ plt.close()
 
 plt.figure(figsize=(9, 5.5))
 for a in algorithms:
-    sub = df_summary[df_summary["Algorytm"] == a]
+    sub = df_summary_primary[df_summary_primary["Algorytm"] == a]
     plt.errorbar(sub["Uzytkownicy"], sub["TPS_mean"], yerr=sub["TPS_std"],
                  label=algo_meta[a]["name"], color=algo_meta[a]["color"],
                  marker=algo_meta[a]["marker"], capsize=4, lw=2, markersize=6)
-plt.title(f"Przepustowosc potwierdzonych transakcji (TPS) w funkcji obciazenia (k={REPEATS} powtorzen, $\\pm 1\\sigma$)", fontsize=11, pad=10)
+plt.title(f"Przepustowosc potwierdzonych transakcji (TPS) w funkcji obciazenia (T={PRIMARY_DURATION_S}s, $\\pm 1\\sigma$)", fontsize=11, pad=10)
 plt.xlabel("Liczba wspolbieznych uzytkownikow (Locust)", fontsize=10)
 plt.ylabel("Przepustowosc lancucha (TPS)", fontsize=10)
-plt.xticks([10, 50, 100, 150, 200, 300, 450])
+plt.xticks(all_users)
 plt.grid(True, ls="--", alpha=0.5)
 plt.legend(frameon=True)
 plt.tight_layout()
@@ -328,17 +364,17 @@ plt.close()
 
 plt.figure(figsize=(9, 5.5))
 for a in algorithms:
-    sub = df_summary[df_summary["Algorytm"] == a]
+    sub = df_summary_primary[df_summary_primary["Algorytm"] == a]
     plt.plot(sub["Uzytkownicy"], sub["Mediana_ms_mean"], color=algo_meta[a]["color"],
               marker=algo_meta[a]["marker"], lw=2, label=f"{algo_meta[a]['name']} (Mediana)")
     plt.plot(sub["Uzytkownicy"], sub["P95_ms_mean"], color=algo_meta[a]["color"],
               ls="--", lw=1.5, alpha=0.8, label=f"{algo_meta[a]['name']} (P95)")
     plt.plot(sub["Uzytkownicy"], sub["P99_ms_mean"], color=algo_meta[a]["color"],
               ls=":", lw=1.5, alpha=0.7, label=f"{algo_meta[a]['name']} (P99)")
-plt.title(f"Opoznienia odpowiedzi RPC (Mediana vs P95 vs P99) w funkcji obciazenia (k={REPEATS})", fontsize=11, pad=10)
+plt.title(f"Opoznienia odpowiedzi RPC (Mediana vs P95 vs P99) w funkcji obciazenia (T={PRIMARY_DURATION_S}s)", fontsize=11, pad=10)
 plt.xlabel("Liczba wspolbieznych uzytkownikow", fontsize=10)
 plt.ylabel("Czas odpowiedzi (ms)", fontsize=10)
-plt.xticks([10, 50, 100, 150, 200, 300, 450])
+plt.xticks(all_users)
 plt.grid(True, ls="--", alpha=0.5)
 plt.legend(fontsize=7, frameon=True, ncol=1)
 plt.tight_layout()
@@ -348,7 +384,7 @@ plt.close()
 fig, ax1 = plt.subplots(figsize=(9, 5.5))
 ax2 = ax1.twinx()
 for a in algorithms:
-    sub = df_summary[df_summary["Algorytm"] == a]
+    sub = df_summary_primary[df_summary_primary["Algorytm"] == a]
     ax1.plot(sub["Uzytkownicy"], sub["CPU_mean"], color=algo_meta[a]["color"],
               marker=algo_meta[a]["marker"], lw=2, label=f"CPU - {algo_meta[a]['name']}")
     ax2.plot(sub["Uzytkownicy"], sub["RAM_mean"], color=algo_meta[a]["color"],
@@ -357,9 +393,9 @@ for a in algorithms:
 ax1.set_xlabel("Liczba wspolbieznych uzytkownikow", fontsize=10)
 ax1.set_ylabel("Utylizacja CPU (%) [Linie ciagle]", fontsize=10)
 ax2.set_ylabel("Alokacja RAM (MB) [Linie przerywane]", fontsize=10)
-ax1.set_xticks([10, 50, 100, 150, 200, 300, 450])
+ax1.set_xticks(all_users)
 ax1.grid(True, ls="--", alpha=0.5)
-ax1.set_title(f"Utylizacja CPU i RAM w funkcji obciazenia (k={REPEATS})", fontsize=11, pad=10)
+ax1.set_title(f"Utylizacja CPU i RAM w funkcji obciazenia (T={PRIMARY_DURATION_S}s)", fontsize=11, pad=10)
 ax1.legend(loc="upper left", fontsize=8)
 plt.tight_layout()
 plt.savefig(os.path.join(CHARTS_DIR, "wykres_zasoby_cpu_ram.png"), dpi=300)
@@ -395,4 +431,47 @@ plt.tight_layout()
 plt.savefig(os.path.join(CHARTS_DIR, "wykres_opoznienie_vs_wezly_poprawiony.png"), dpi=300)
 plt.close()
 
-print("\nWSZYSTKIE TESTY DLA k=5 ZAKONCZONE. WYKRESY I STATYSTYKI ZAKTUALIZOWANE.")
+duration_values = sorted(df_summary["Czas_testu_s"].unique())
+for ref_u in [150, 600]:
+    if ref_u not in all_users:
+        continue
+
+    plt.figure(figsize=(9, 5.5))
+    for a in algorithms:
+        sub = df_summary[(df_summary["Algorytm"] == a) & (df_summary["Uzytkownicy"] == ref_u)]
+        sub = sub.sort_values("Czas_testu_s")
+        if sub.empty:
+            continue
+        plt.errorbar(sub["Czas_testu_s"], sub["TPS_mean"], yerr=sub["TPS_std"],
+                     label=algo_meta[a]["name"], color=algo_meta[a]["color"],
+                     marker=algo_meta[a]["marker"], capsize=4, lw=2, markersize=6)
+    plt.title(f"Wplyw czasu trwania testu na TPS (U={ref_u}, $\\pm 1\\sigma$)", fontsize=11, pad=10)
+    plt.xlabel("Czas trwania pojedynczego testu (s)", fontsize=10)
+    plt.ylabel("Przepustowosc lancucha (TPS)", fontsize=10)
+    plt.xticks(duration_values)
+    plt.grid(True, ls="--", alpha=0.5)
+    plt.legend(frameon=True)
+    plt.tight_layout()
+    plt.savefig(os.path.join(CHARTS_DIR, f"wykres_tps_vs_czas_trwania_u{ref_u}.png"), dpi=300)
+    plt.close()
+
+    plt.figure(figsize=(9, 5.5))
+    for a in algorithms:
+        sub = df_summary[(df_summary["Algorytm"] == a) & (df_summary["Uzytkownicy"] == ref_u)]
+        sub = sub.sort_values("Czas_testu_s")
+        if sub.empty:
+            continue
+        plt.errorbar(sub["Czas_testu_s"], sub["Mediana_ms_mean"], yerr=sub["Mediana_ms_std"],
+                     label=algo_meta[a]["name"], color=algo_meta[a]["color"],
+                     marker=algo_meta[a]["marker"], capsize=4, lw=2, markersize=6)
+    plt.title(f"Wplyw czasu trwania testu na mediane opoznienia (U={ref_u}, $\\pm 1\\sigma$)", fontsize=11, pad=10)
+    plt.xlabel("Czas trwania pojedynczego testu (s)", fontsize=10)
+    plt.ylabel("Mediana czasu odpowiedzi (ms)", fontsize=10)
+    plt.xticks(duration_values)
+    plt.grid(True, ls="--", alpha=0.5)
+    plt.legend(frameon=True)
+    plt.tight_layout()
+    plt.savefig(os.path.join(CHARTS_DIR, f"wykres_opoznienia_vs_czas_trwania_u{ref_u}.png"), dpi=300)
+    plt.close()
+
+print("\nWSZYSTKIE TESTY ZAKONCZONE. WYKRESY I STATYSTYKI ZAKTUALIZOWANE.")
