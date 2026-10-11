@@ -1,0 +1,9 @@
+logs/
+results/
+*.bak
+*.bak2
+.account_counter
+sweep_overall*.log
+locust_*_check.log
+tps_*_check.csv
+mem_check.log
