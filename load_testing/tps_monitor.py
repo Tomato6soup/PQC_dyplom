@@ -41,6 +41,11 @@ def main():
                               "(np. 'submit_pqc'). Jeśli nie podasz, skrypt wypisze "
                               "na końcu wszystkie napotkane nazwy calli, żebyś mogła "
                               "dobrać filtr i odpalić ponownie / przeliczyć ręcznie.")
+    parser.add_argument("--warmup-s", type=float, default=0.0,
+                         help="Czas rozgrzewki (sekundy) odrzucany z pomiaru TPS od "
+                              "startu skryptu — bloki z tego okna są liczone do "
+                              "'total/matched' ale NIE wliczane do TPS (dopasuj do "
+                              "U/SPAWN_RATE locusta, żeby nie liczyć fazy rampowania).")
     args = parser.parse_args()
 
     substrate = SubstrateInterface(url=args.host)
@@ -93,9 +98,12 @@ def main():
                             if name != "Timestamp.set":
                                 matched_extrinsics += 1
                                 block_extr_count += 1
-                    blocks_seen.append((n, block_extr_count, time.time()))
+                    block_ts = time.time()
+                    is_warmup = (block_ts - start_time) < args.warmup_s
+                    blocks_seen.append((n, block_extr_count, block_ts, is_warmup))
+                    tag = " [warmup]" if is_warmup else ""
                     print(f"[tps_monitor] blok #{n}: {len(extrinsics)} ekstrinsiców "
-                          f"(policzone jako nasze: {block_extr_count})")
+                          f"(policzone jako nasze: {block_extr_count}){tag}")
                 current_number = number
 
             time.sleep(0.5)
@@ -105,14 +113,30 @@ def main():
 
     actual_elapsed = time.time() - start_time
 
+    post_warmup_blocks = [b for b in blocks_seen if not b[3]]
+    post_warmup_matched = sum(b[1] for b in post_warmup_blocks)
+
     print("\n" + "=" * 70)
     print("WYNIK POMIARU TPS")
     print("=" * 70)
     print(f"Czas trwania pomiaru:         {actual_elapsed:.1f}s")
-    print(f"Bloków zaobserwowanych:       {len(blocks_seen)}")
+    print(f"Rozgrzewka odrzucona:         {args.warmup_s:.1f}s "
+          f"({len(blocks_seen) - len(post_warmup_blocks)} blok(ów) odrzuconych)")
+    print(f"Bloków zaobserwowanych:       {len(blocks_seen)} "
+          f"(po rozgrzewce: {len(post_warmup_blocks)})")
     print(f"Ekstrinsiców razem:           {total_extrinsics}")
-    print(f"Ekstrinsiców 'naszych':       {matched_extrinsics}")
-    print(f"TPS (nasze / czas trwania):   {matched_extrinsics / actual_elapsed:.2f}")
+    print(f"Ekstrinsiców 'naszych':       {matched_extrinsics} "
+          f"(po rozgrzewce: {post_warmup_matched})")
+    print(f"TPS (nasze / czas trwania, CAŁE okno):         "
+          f"{matched_extrinsics / actual_elapsed:.2f}")
+
+    if len(post_warmup_blocks) >= 2:
+        span_pw = post_warmup_blocks[-1][2] - post_warmup_blocks[0][2]
+        if span_pw > 0:
+            print(f"TPS (nasze / rozpiętość PO rozgrzewce = {span_pw:.1f}s):  "
+                  f"{post_warmup_matched / span_pw:.2f}")
+    elif args.warmup_s > 0:
+        print("TPS po rozgrzewce: niewystarczająco bloków po odrzuceniu rozgrzewki.")
 
     if len(blocks_seen) >= 2:
         span = blocks_seen[-1][2] - blocks_seen[0][2]

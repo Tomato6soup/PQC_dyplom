@@ -1,77 +1,91 @@
+#!/usr/bin/env python3
+"""
+fund_accounts.py — dofinansowuje konta testowe z //Alice po restarcie noda.
+
+W tym chain specu (--dev) genesis finansuje TYLKO Alice, Bob, AliceStash,
+BobStash (patrz runtime/src/genesis_config_presets.rs) — Charlie/Dave/Eve/
+Ferdie startuja z saldem 0. Ten skrypt przelewa z Alice odpowiednia kwote na
+kazde konto z batch_accounts.json (poza Alice/Bob, ktore juz sa finansowane)
+i czeka na zaincludowanie przelewow w bloku, zanim test ruszy.
+
+Uzycie:
+    python3 fund_accounts.py --host ws://127.0.0.1:9944 --amount 1000000000000000000
+"""
+
+import argparse
 import json
 import os
 import time
-import requests
+
 from substrateinterface import SubstrateInterface, Keypair
 
-N_ACCOUNTS = 600
-FUNDING_AMOUNT = 10**14
-CHUNK_SIZE = 40
-RPC_URL = "http://127.0.0.1:9944"
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ACCOUNTS_PATH = os.path.join(BASE_DIR, "batch_accounts.json")
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--host", default="ws://127.0.0.1:9944")
+    parser.add_argument("--amount", type=int, default=10**14,
+                         help="Kwota do przelania na kazde nie-finansowane konto "
+                              "(Alice ma ~1.15e18 w genesis --dev - zostaw duzy margines)")
+    parser.add_argument("--accounts-file", default=None,
+                         help="Domyslnie batch_accounts.json w tym samym katalogu")
+    args = parser.parse_args()
 
-substrate = SubstrateInterface(url="ws://127.0.0.1:9944")
-alice = Keypair.create_from_uri("//Alice")
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    accounts_path = args.accounts_file or os.path.join(base_dir, "batch_accounts.json")
+    with open(accounts_path) as f:
+        uris = json.load(f)
 
+    substrate = SubstrateInterface(url=args.host)
+    alice = Keypair.create_from_uri("//Alice")
 
-def rpc_call(method, params=None):
-    payload = {"jsonrpc": "2.0", "id": 1, "method": method, "params": params or []}
-    r = requests.post(RPC_URL, json=payload, timeout=5)
-    return r.json().get("result")
+    # Konta juz finansowane w genesis (--dev): Alice, Bob, AliceStash, BobStash.
+    already_funded = {"//Alice", "//Bob", "//Alice//stash", "//Bob//stash"}
 
+    to_fund = [u for u in uris if u not in already_funded]
+    if not to_fund:
+        print("[fund_accounts] Nic do dofinansowania (wszystkie konta juz finansowane w genesis).")
+        return
 
-def wait_for_pool_drain(max_wait_s=60, poll_s=1.5, stable_needed=2):
-    stable, waited = 0, 0.0
-    while waited < max_wait_s:
-        pending = rpc_call("author_pendingExtrinsics", [])
-        if pending is not None and len(pending) == 0:
-            stable += 1
-            if stable >= stable_needed:
-                return True
-        else:
-            stable = 0
-        time.sleep(poll_s)
-        waited += poll_s
-    return False
+    print(f"[fund_accounts] Dofinansowuje {len(to_fund)} kont z //Alice "
+          f"(kwota/konto: {args.amount})...")
 
-
-accounts = [f"//BatchUser{i}" for i in range(N_ACCOUNTS)]
-
-print(f"Zasilanie {N_ACCOUNTS} kont w paczkach po {CHUNK_SIZE}...")
-for start in range(0, N_ACCOUNTS, CHUNK_SIZE):
-    chunk = accounts[start:start + CHUNK_SIZE]
     nonce = substrate.get_account_nonce(alice.ss58_address)
-    for uri in chunk:
-        kp = Keypair.create_from_uri(uri)
+    start_nonce = nonce
+    for uri in to_fund:
+        dest = Keypair.create_from_uri(uri)
         call = substrate.compose_call(
             call_module="Balances",
-            call_function="transfer_allow_death",
-            call_params={"dest": kp.ss58_address, "value": FUNDING_AMOUNT}
+            call_function="transfer_keep_alive",
+            call_params={"dest": dest.ss58_address, "value": args.amount},
         )
         extrinsic = substrate.create_signed_extrinsic(call=call, keypair=alice, nonce=nonce)
         substrate.submit_extrinsic(extrinsic, wait_for_inclusion=False)
         nonce += 1
-    ok = wait_for_pool_drain()
-    done = min(start + CHUNK_SIZE, N_ACCOUNTS)
-    print(f"  paczka {start}-{done-1} wyslana, pula oprozniona: {ok} ({done}/{N_ACCOUNTS})")
 
-with open(ACCOUNTS_PATH, "w") as f:
-    json.dump(accounts, f, indent=2)
+    # Nonce'y z Alice sa sekwencyjne i (przy jednym nodzie bez forkow) wchodza
+    # do blokow w tej samej kolejnosci, w ktorej zostaly zlozone - sprawdzamy
+    # tylko OSTATNIE konto (i nonce Alice), zamiast odpytywac wszystkie N kont
+    # w kazdej iteracji (zbyt kosztowne przy setkach kont).
+    last_uri = to_fund[-1]
+    last_dest = Keypair.create_from_uri(last_uri)
+    deadline = time.time() + max(30, len(to_fund) // 20)
+    funded = False
+    while time.time() < deadline:
+        time.sleep(1)
+        acc = substrate.query("System", "Account", [last_dest.ss58_address])
+        alice_nonce_now = substrate.get_account_nonce(alice.ss58_address)
+        if acc.value["data"]["free"] > 0 and alice_nonce_now >= nonce:
+            funded = True
+            break
 
-print("\nWeryfikacja salda na probce 10 kont:")
-all_ok = True
-for i in [0, 50, 100, 200, 300, 400, 499, 550, 590, 599]:
-    kp = Keypair.create_from_uri(accounts[i])
-    balance = substrate.query("System", "Account", [kp.ss58_address])
-    free = balance.value['data']['free']
-    status = "OK" if free > FUNDING_AMOUNT // 2 else "BRAK SRODKOW!"
-    if free <= FUNDING_AMOUNT // 2:
-        all_ok = False
-    print(f"  [{i}] {accounts[i]}: {free}  -> {status}")
+    if not funded:
+        current_nonce = substrate.get_account_nonce(alice.ss58_address)
+        print(f"[fund_accounts] UWAGA: ostatnie konto ({last_uri}) nie doczekalo sie "
+              f"salda / nonce Alice nie dogonil {nonce} (jest: {current_nonce})")
+    else:
+        print(f"[fund_accounts] Wszystkie {len(to_fund)} kont dofinansowane "
+              f"(nonce Alice {start_nonce}->{nonce}, potwierdzone na chainie).")
 
-if all_ok:
-    print(f"\nWszystkie sprawdzone konta poprawnie zasilone. Zapisano {N_ACCOUNTS} kont do {ACCOUNTS_PATH}")
-else:
-    print("\nUWAGA: niektore konta NIE zostaly zasilone poprawnie!")
+
+if __name__ == "__main__":
+    main()

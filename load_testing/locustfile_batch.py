@@ -48,6 +48,8 @@ def _pick_account_uri():
                 f.seek(0)
                 f.truncate()
                 f.write(str(idx + 1))
+                f.flush()
+                os.fsync(f.fileno())
             finally:
                 fcntl.flock(f, fcntl.LOCK_UN)
     return ACCOUNT_URIS[idx % len(ACCOUNT_URIS)]
