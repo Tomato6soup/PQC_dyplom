@@ -1,0 +1,726 @@
+node default: /home/martyna/node-default-v3 sha256=c2a149e773d9f9514d8f08d4984ec35b6a9373f390fa8271c484fb4bd51fe8e6
+node raised:  /home/martyna/node-raised sha256=b4f443448138199bfad3253ef1dfcc3815d772d985b222f4f70a0693ea2f0eb6
+flagi wspolne: --rpc-max-response-size 512 --pool-limit 100000 --pool-kbytes 2097152
+baza node'a:   /home/martyna/node_base_v3
+=== [1/90] default_ecdsa_u1_run1 21:19:20 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2356     0(0.00%) |      4       2       9      4 |   17.07        0.00
+    bloki:  31, pool max ready: 97
+=== [2/90] raised_ecdsa_u1_run1 21:22:47 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2357     0(0.00%) |      4       2       8      4 |   17.08        0.00
+    bloki:  31, pool max ready: 100
+=== [3/90] default_ecdsa_u10_run1 21:26:18 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23949     0(0.00%) |      3       1     146      3 |  173.49        0.00
+    bloki:  31, pool max ready: 1010
+=== [4/90] raised_ecdsa_u10_run1 21:29:48 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23856     0(0.00%) |      3       1     153      3 |  172.87        0.00
+    bloki:  31, pool max ready: 1000
+=== [5/90] default_ecdsa_u100_run1 21:33:18 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                    105785     0(0.00%) |     75       1    1187      9 |  746.05        0.00
+    bloki:  32, pool max ready: 52782
+=== [6/90] raised_ecdsa_u100_run1 21:36:53 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                    212740     0(0.00%) |     10       1    1333      4 | 1497.77        0.00
+    bloki:  31, pool max ready: 11670
+=== [7/90] default_dilithium2_u1_run1 21:40:28 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2353     0(0.00%) |      4       2       8      4 |   17.05        0.00
+    bloki:  31, pool max ready: 88
+=== [8/90] raised_dilithium2_u1_run1 21:44:00 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2349     0(0.00%) |      4       2       8      4 |   17.02        0.00
+    bloki:  31, pool max ready: 102
+=== [9/90] default_dilithium2_u10_run1 21:47:29 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23878     0(0.00%) |      3       1     167      3 |  173.04        0.00
+    bloki:  31, pool max ready: 1505
+=== [10/90] raised_dilithium2_u10_run1 21:51:00 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23826     0(0.00%) |      3       1     182      3 |  172.66        0.00
+    bloki:  31, pool max ready: 1050
+=== [11/90] default_dilithium2_u100_run1 21:54:30 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     85605     0(0.00%) |    105       1    1352      9 |  602.68        0.00
+    bloki:  32, pool max ready: 62131
+=== [12/90] raised_dilithium2_u100_run1 21:58:05 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                    128516     0(0.00%) |     52       1    1330     10 |  904.56        0.00
+    bloki:  32, pool max ready: 37733
+=== [13/90] default_sphincs_u1_run1 22:01:41 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2336     0(0.00%) |      4       2       9      4 |   16.93        0.00
+    bloki:  31, pool max ready: 91
+=== [14/90] raised_sphincs_u1_run1 22:05:14 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2340     0(0.00%) |      4       2      10      4 |   16.96        0.00
+    bloki:  31, pool max ready: 94
+=== [15/90] default_sphincs_u10_run1 22:08:49 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     20984     0(0.00%) |     11       2     399      4 |  152.03        0.00
+    bloki:  31, pool max ready: 15766
+=== [16/90] raised_sphincs_u10_run1 22:12:20 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23409     0(0.00%) |      4       2     148      4 |  169.58        0.00
+    bloki:  31, pool max ready: 4092
+=== [17/90] default_sphincs_u100_run1 22:15:48 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     71317     0(0.00%) |    138       2    2031     13 |  503.54        0.00
+    bloki:  32, pool max ready: 65876
+=== [18/90] raised_sphincs_u100_run1 22:19:23 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     76350     0(0.00%) |    125       2    1603     13 |  538.75        0.00
+    bloki:  32, pool max ready: 59428
+=== [19/90] default_ecdsa_u1_run2 22:22:59 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2355     0(0.00%) |      4       2       9      4 |   17.06        0.00
+    bloki:  31, pool max ready: 99
+=== [20/90] raised_ecdsa_u1_run2 22:26:30 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2352     0(0.00%) |      4       2       8      4 |   17.05        0.00
+    bloki:  31, pool max ready: 99
+=== [21/90] default_ecdsa_u10_run2 22:30:00 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23836     0(0.00%) |      3       1     160      3 |  172.73        0.00
+    bloki:  31, pool max ready: 990
+=== [22/90] raised_ecdsa_u10_run2 22:33:30 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23860     0(0.00%) |      3       1     156      3 |  172.90        0.00
+    bloki:  31, pool max ready: 1000
+=== [23/90] default_ecdsa_u100_run2 22:37:00 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                    105603     0(0.00%) |     75       1    1257      9 |  744.58        0.00
+    bloki:  32, pool max ready: 52888
+=== [24/90] raised_ecdsa_u100_run2 22:40:35 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                    213367     0(0.00%) |     10       1    1258      4 | 1502.04        0.00
+    bloki:  31, pool max ready: 11991
+=== [25/90] default_dilithium2_u1_run2 22:44:12 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2348     0(0.00%) |      4       2       9      4 |   17.01        0.00
+    bloki:  31, pool max ready: 89
+=== [26/90] raised_dilithium2_u1_run2 22:47:42 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2347     0(0.00%) |      4       2       9      4 |   17.00        0.00
+    bloki:  31, pool max ready: 87
+=== [27/90] default_dilithium2_u10_run2 22:51:12 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23796     0(0.00%) |      3       1     170      3 |  172.39        0.00
+    bloki:  31, pool max ready: 1455
+=== [28/90] raised_dilithium2_u10_run2 22:54:42 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23985     0(0.00%) |      3       1     173      3 |  173.75        0.00
+    bloki:  30, pool max ready: 1035
+=== [29/90] default_dilithium2_u100_run2 22:58:12 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     86411     0(0.00%) |    104       1    1275      8 |  608.70        0.00
+    bloki:  32, pool max ready: 62910
+=== [30/90] raised_dilithium2_u100_run2 23:01:47 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                    128749     0(0.00%) |     52       1    1240      9 |  906.11        0.00
+    bloki:  32, pool max ready: 37908
+=== [31/90] default_sphincs_u1_run2 23:05:23 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2334     0(0.00%) |      4       2       9      4 |   16.91        0.00
+    bloki:  31, pool max ready: 93
+=== [32/90] raised_sphincs_u1_run2 23:08:56 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2334     0(0.00%) |      4       2      11      4 |   16.91        0.00
+    bloki:  31, pool max ready: 95
+=== [33/90] default_sphincs_u10_run2 23:12:31 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     20974     0(0.00%) |     11       2     403      4 |  152.00        0.00
+    bloki:  31, pool max ready: 15763
+=== [34/90] raised_sphincs_u10_run2 23:16:02 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23415     0(0.00%) |      4       2     150      4 |  169.67        0.00
+    bloki:  31, pool max ready: 4053
+=== [35/90] default_sphincs_u100_run2 23:19:30 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     73359     0(0.00%) |    133       2    1844     11 |  517.56        0.00
+    bloki:  32, pool max ready: 67921
+=== [36/90] raised_sphincs_u100_run2 23:23:05 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     74519     0(0.00%) |    129       2    1618     14 |  525.51        0.00
+    bloki:  31, pool max ready: 58125
+=== [37/90] default_ecdsa_u1_run3 23:26:40 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2365     0(0.00%) |      3       2      12      3 |   17.13        0.00
+    bloki:  31, pool max ready: 101
+=== [38/90] raised_ecdsa_u1_run3 23:30:11 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2346     0(0.00%) |      4       2       8      4 |   17.00        0.00
+    bloki:  31, pool max ready: 98
+=== [39/90] default_ecdsa_u10_run3 23:33:42 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23854     0(0.00%) |      3       1     178      3 |  172.80        0.00
+    bloki:  31, pool max ready: 1009
+=== [40/90] raised_ecdsa_u10_run3 23:37:12 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23860     0(0.00%) |      3       1     147      3 |  172.85        0.00
+    bloki:  31, pool max ready: 1000
+=== [41/90] default_ecdsa_u100_run3 23:40:42 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                    105834     0(0.00%) |     75       1    1282      9 |  745.07        0.00
+    bloki:  32, pool max ready: 53068
+=== [42/90] raised_ecdsa_u100_run3 23:44:17 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                    212787     0(0.00%) |     10       1    1233      4 | 1498.08        0.00
+    bloki:  31, pool max ready: 11839
+=== [43/90] default_dilithium2_u1_run3 23:47:54 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2348     0(0.00%) |      4       2       9      4 |   17.02        0.00
+    bloki:  31, pool max ready: 88
+=== [44/90] raised_dilithium2_u1_run3 23:51:24 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2347     0(0.00%) |      4       2      11      4 |   17.01        0.00
+    bloki:  31, pool max ready: 102
+=== [45/90] default_dilithium2_u10_run3 23:54:53 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23779     0(0.00%) |      3       1     185      3 |  172.27        0.00
+    bloki:  31, pool max ready: 1415
+=== [46/90] raised_dilithium2_u10_run3 23:58:24 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23776     0(0.00%) |      3       1     140      3 |  172.29        0.00
+    bloki:  31, pool max ready: 990
+=== [47/90] default_dilithium2_u100_run3 00:01:53 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     86357     0(0.00%) |    104       1    1392      8 |  608.30        0.00
+    bloki:  32, pool max ready: 62812
+=== [48/90] raised_dilithium2_u100_run3 00:05:29 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                    128888     0(0.00%) |     52       1    1246      9 |  907.77        0.00
+    bloki:  31, pool max ready: 39032
+=== [49/90] default_sphincs_u1_run3 00:09:06 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2333     0(0.00%) |      4       2       9      4 |   16.90        0.00
+    bloki:  31, pool max ready: 102
+=== [50/90] raised_sphincs_u1_run3 00:12:35 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2336     0(0.00%) |      4       2      10      4 |   16.93        0.00
+    bloki:  31, pool max ready: 98
+=== [51/90] default_sphincs_u10_run3 00:16:08 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     20979     0(0.00%) |     11       2     409      4 |  152.04        0.00
+    bloki:  31, pool max ready: 15768
+=== [52/90] raised_sphincs_u10_run3 00:19:36 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23403     0(0.00%) |      4       2     158      4 |  169.62        0.00
+    bloki:  31, pool max ready: 3965
+=== [53/90] default_sphincs_u100_run3 00:23:07 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     73334     0(0.00%) |    133       2    1829     11 |  516.51        0.00
+    bloki:  32, pool max ready: 67986
+=== [54/90] raised_sphincs_u100_run3 00:26:41 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     76908     0(0.00%) |    124       2    1643     13 |  541.30        0.00
+    bloki:  31, pool max ready: 59869
+=== [55/90] default_ecdsa_u1_run4 00:30:18 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2352     0(0.00%) |      4       2       8      4 |   17.04        0.00
+    bloki:  31, pool max ready: 94
+=== [56/90] raised_ecdsa_u1_run4 00:33:50 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2358     0(0.00%) |      4       1       8      4 |   17.08        0.00
+    bloki:  31, pool max ready: 96
+=== [57/90] default_ecdsa_u10_run4 00:37:25 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23849     0(0.00%) |      3       1     173      3 |  172.77        0.00
+    bloki:  31, pool max ready: 990
+=== [58/90] raised_ecdsa_u10_run4 00:40:54 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23886     0(0.00%) |      3       1     164      3 |  173.04        0.00
+    bloki:  31, pool max ready: 1010
+=== [59/90] default_ecdsa_u100_run4 00:44:23 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                    105285     0(0.00%) |     75       1    1245      8 |  743.33        0.00
+    bloki:  32, pool max ready: 51997
+=== [60/90] raised_ecdsa_u100_run4 00:47:59 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                    213251     0(0.00%) |     10       1    1236      4 | 1501.78        0.00
+    bloki:  31, pool max ready: 11609
+=== [61/90] default_dilithium2_u1_run4 00:51:36 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2344     0(0.00%) |      4       2       9      4 |   16.99        0.00
+    bloki:  31, pool max ready: 86
+=== [62/90] raised_dilithium2_u1_run4 00:55:06 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2348     0(0.00%) |      4       2      10      4 |   17.01        0.00
+    bloki:  31, pool max ready: 104
+=== [63/90] default_dilithium2_u10_run4 00:58:36 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23797     0(0.00%) |      3       1     143      3 |  172.40        0.00
+    bloki:  31, pool max ready: 1435
+=== [64/90] raised_dilithium2_u10_run4 01:02:05 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23796     0(0.00%) |      3       1     208      3 |  172.44        0.00
+    bloki:  31, pool max ready: 1010
+=== [65/90] default_dilithium2_u100_run4 01:05:36 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     85971     0(0.00%) |    104       1    1265      8 |  606.20        0.00
+    bloki:  32, pool max ready: 62483
+=== [66/90] raised_dilithium2_u100_run4 01:09:11 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                    128938     0(0.00%) |     52       1    1323      9 |  907.69        0.00
+    bloki:  31, pool max ready: 38927
+=== [67/90] default_sphincs_u1_run4 01:12:46 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2333     0(0.00%) |      4       2       9      4 |   16.91        0.00
+    bloki:  31, pool max ready: 106
+=== [68/90] raised_sphincs_u1_run4 01:16:18 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2395     0(0.00%) |      3       2       9      3 |   17.35        0.00
+    bloki:  31, pool max ready: 106
+=== [69/90] default_sphincs_u10_run4 01:19:48 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     21065     0(0.00%) |     11       2     402      4 |  152.59        0.00
+    bloki:  30, pool max ready: 15644
+=== [70/90] raised_sphincs_u10_run4 01:23:20 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23397     0(0.00%) |      4       2     167      4 |  169.49        0.00
+    bloki:  31, pool max ready: 4170
+=== [71/90] default_sphincs_u100_run4 01:26:55 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     73533     0(0.00%) |    132       2    1854     12 |  517.67        0.00
+    bloki:  32, pool max ready: 68150
+=== [72/90] raised_sphincs_u100_run4 01:30:29 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     76490     0(0.00%) |    124       2    1633     13 |  540.76        0.00
+    bloki:  31, pool max ready: 59357
+=== [73/90] default_ecdsa_u1_run5 01:34:06 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2356     0(0.00%) |      4       2       8      4 |   17.07        0.00
+    bloki:  31, pool max ready: 88
+=== [74/90] raised_ecdsa_u1_run5 01:37:36 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2358     0(0.00%) |      4       2       8      4 |   17.08        0.00
+    bloki:  31, pool max ready: 100
+=== [75/90] default_ecdsa_u10_run5 01:41:07 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23854     0(0.00%) |      3       1     153      3 |  172.80        0.00
+    bloki:  31, pool max ready: 1020
+=== [76/90] raised_ecdsa_u10_run5 01:44:37 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23864     0(0.00%) |      3       1     171      3 |  172.87        0.00
+    bloki:  31, pool max ready: 1020
+=== [77/90] default_ecdsa_u100_run5 01:48:05 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                    105475     0(0.00%) |     75       1    1498      9 |  746.13        0.00
+    bloki:  32, pool max ready: 52073
+=== [78/90] raised_ecdsa_u100_run5 01:51:41 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                    212955     0(0.00%) |     10       1    1236      4 | 1500.05        0.00
+    bloki:  31, pool max ready: 11379
+=== [79/90] default_dilithium2_u1_run5 01:55:16 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2347     0(0.00%) |      4       2       9      4 |   17.00        0.00
+    bloki:  31, pool max ready: 87
+=== [80/90] raised_dilithium2_u1_run5 01:58:48 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2347     0(0.00%) |      4       2      10      4 |   17.01        0.00
+    bloki:  31, pool max ready: 101
+=== [81/90] default_dilithium2_u10_run5 02:02:18 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23805     0(0.00%) |      3       1     158      3 |  172.51        0.00
+    bloki:  31, pool max ready: 1445
+=== [82/90] raised_dilithium2_u10_run5 02:05:49 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23777     0(0.00%) |      3       1     162      3 |  172.24        0.00
+    bloki:  31, pool max ready: 1010
+=== [83/90] default_dilithium2_u100_run5 02:09:18 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     86683     0(0.00%) |    104       1    1289      9 |  610.82        0.00
+    bloki:  32, pool max ready: 63164
+=== [84/90] raised_dilithium2_u100_run5 02:12:53 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                    128460     0(0.00%) |     52       1    1249     10 |  906.36        0.00
+    bloki:  31, pool max ready: 38731
+=== [85/90] default_sphincs_u1_run5 02:16:28 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2335     0(0.00%) |      4       2       9      4 |   16.92        0.00
+    bloki:  31, pool max ready: 107
+=== [86/90] raised_sphincs_u1_run5 02:20:00 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                      2334     0(0.00%) |      4       2       9      4 |   16.91        0.00
+    bloki:  31, pool max ready: 104
+=== [87/90] default_sphincs_u10_run5 02:23:32 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     20957     0(0.00%) |     11       2     414      4 |  151.90        0.00
+    bloki:  31, pool max ready: 15746
+=== [88/90] raised_sphincs_u10_run5 02:27:05 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     23410     0(0.00%) |      4       2     159      4 |  169.59        0.00
+    bloki:  31, pool max ready: 3856
+=== [89/90] default_sphincs_u100_run5 02:30:38 ===
+    [node] restart OK (default), gotowy po 2s
+    [node] BlockLength Normal=3932160 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     73438     0(0.00%) |    132       2    1843     12 |  517.57        0.00
+    bloki:  32, pool max ready: 67992
+=== [90/90] raised_sphincs_u100_run5 02:34:11 ===
+    [node] restart OK (raised), gotowy po 2s
+    [node] BlockLength Normal=15728640 OK
+[fund_accounts] Dofinansowuje 650 kont z //Alice (kwota/konto: 100000000000000)...
+[fund_accounts] Wszystkie 650 kont dofinansowane (nonce Alice 0->650, potwierdzone na chainie).
+    [pool] pusty po 0s, czekam jeszcze 5s...
+    locust:          Aggregated                                                                     76762     0(0.00%) |    124       2    1643     13 |  541.51        0.00
+    bloki:  31, pool max ready: 59043
+
+Gotowe: 90 pozycji w logs_final_v3/, czas calkowity: 318 min

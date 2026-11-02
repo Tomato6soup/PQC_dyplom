@@ -1,0 +1,192 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 9cf683f..0d028ae 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -2673,6 +2673,30 @@ dependencies = [
+  "scale-info",
+ ]
+ 
++[[package]]
++name = "fips204"
++version = "0.4.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "c9fb5a367b9846933e271a3c2a992930743f82ae5e8cb7faa780715a80fa0b15"
++dependencies = [
++ "rand_core 0.6.4",
++ "sha2 0.10.9",
++ "sha3",
++ "zeroize",
++]
++
++[[package]]
++name = "fips205"
++version = "0.4.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "2f5626bf5534df4ebdbd2536465d7eaa8a9dc2cdeb7e036e0ecf291dcc80ffb6"
++dependencies = [
++ "rand_core 0.6.4",
++ "sha2 0.10.9",
++ "sha3",
++ "zeroize",
++]
++
+ [[package]]
+ name = "fixed-hash"
+ version = "0.8.0"
+@@ -5905,6 +5929,22 @@ dependencies = [
+  "sp-staking",
+ ]
+ 
++[[package]]
++name = "pallet-pqc-bench"
++version = "0.1.0"
++dependencies = [
++ "fips204",
++ "fips205",
++ "frame-support",
++ "frame-system",
++ "hex",
++ "parity-scale-codec",
++ "scale-info",
++ "serde_json",
++ "sp-core",
++ "sp-io",
++]
++
+ [[package]]
+ name = "pallet-session"
+ version = "40.0.0"
+@@ -9471,6 +9511,7 @@ dependencies = [
+  "pallet-aura",
+  "pallet-balances",
+  "pallet-grandpa",
++ "pallet-pqc-bench",
+  "pallet-sudo",
+  "pallet-template",
+  "pallet-timestamp",
+diff --git a/Cargo.toml b/Cargo.toml
+index 4e10d67..5fbcade 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -9,6 +9,7 @@ edition = "2021"
+ members = [
+     "node",
+     "pallets/template",
++    "pallets/pqc-bench",
+     "runtime",
+ ]
+ resolver = "2"
+@@ -16,6 +17,7 @@ resolver = "2"
+ [workspace.dependencies]
+ solochain-template-runtime = { path = "./runtime", default-features = false }
+ pallet-template = { path = "./pallets/template", default-features = false }
++pallet-pqc-bench = { path = "./pallets/pqc-bench", default-features = false }
+ clap = { version = "4.5.13" }
+ frame-benchmarking-cli = { version = "47.0.0", default-features = false }
+ frame-metadata-hash-extension = { version = "0.8.0", default-features = false }
+diff --git a/node/src/service.rs b/node/src/service.rs
+index 79d97fb..f948bc8 100644
+--- a/node/src/service.rs
++++ b/node/src/service.rs
+@@ -237,13 +237,18 @@ pub fn new_full<
+ 	})?;
+ 
+ 	if role.is_authority() {
+-		let proposer_factory = sc_basic_authorship::ProposerFactory::new(
++		let mut proposer_factory = sc_basic_authorship::ProposerFactory::new(
+ 			task_manager.spawn_handle(),
+ 			client.clone(),
+ 			transaction_pool.clone(),
+ 			prometheus_registry.as_ref(),
+ 			telemetry.as_ref().map(|x| x.handle()),
+ 		);
++                if let Ok(v) = std::env::var("PQC_BLOCK_SIZE_LIMIT") {
++                        if let Ok(n) = v.parse::<usize>() {
++                                proposer_factory.set_default_block_size_limit(n);
++                        }
++                }
+ 
+ 		let slot_duration = sc_consensus_aura::slot_duration(&*client)?;
+ 
+diff --git a/runtime/Cargo.toml b/runtime/Cargo.toml
+index b10319c..ef55e03 100644
+--- a/runtime/Cargo.toml
++++ b/runtime/Cargo.toml
+@@ -27,6 +27,7 @@ pallet-balances.workspace = true
+ pallet-grandpa.workspace = true
+ pallet-sudo.workspace = true
+ pallet-template.workspace = true
++pallet-pqc-bench.workspace = true
+ pallet-timestamp.workspace = true
+ pallet-transaction-payment-rpc-runtime-api.workspace = true
+ pallet-transaction-payment.workspace = true
+@@ -51,6 +52,7 @@ sp-version = { features = ["serde"], workspace = true }
+ substrate-wasm-builder = { optional = true, workspace = true, default-features = true }
+ 
+ [features]
++raised-limits = []
+ default = ["std"]
+ std = [
+ 	"codec/std",
+@@ -67,6 +69,7 @@ std = [
+ 	"pallet-grandpa/std",
+ 	"pallet-sudo/std",
+ 	"pallet-template/std",
++        "pallet-pqc-bench/std",
+ 	"pallet-timestamp/std",
+ 	"pallet-transaction-payment-rpc-runtime-api/std",
+ 	"pallet-transaction-payment/std",
+diff --git a/runtime/src/configs/mod.rs b/runtime/src/configs/mod.rs
+index e34b3cb..28de3b2 100644
+--- a/runtime/src/configs/mod.rs
++++ b/runtime/src/configs/mod.rs
+@@ -47,16 +47,26 @@ use super::{
+ 
+ const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
+ 
++#[cfg(not(feature = "raised-limits"))]
++const MAX_BLOCK_LENGTH: u32 = 5 * 1024 * 1024;
++#[cfg(feature = "raised-limits")]
++const MAX_BLOCK_LENGTH: u32 = 20 * 1024 * 1024;
++
++#[cfg(not(feature = "raised-limits"))]
++const MAX_BLOCK_REF_TIME: u64 = 2u64 * WEIGHT_REF_TIME_PER_SECOND;
++#[cfg(feature = "raised-limits")]
++const MAX_BLOCK_REF_TIME: u64 = 200u64 * WEIGHT_REF_TIME_PER_SECOND;
++
+ parameter_types! {
+ 	pub const BlockHashCount: BlockNumber = 2400;
+ 	pub const Version: RuntimeVersion = VERSION;
+ 
+ 	/// We allow for 2 seconds of compute with a 6 second average block time.
+ 	pub RuntimeBlockWeights: BlockWeights = BlockWeights::with_sensible_defaults(
+-		Weight::from_parts(2u64 * WEIGHT_REF_TIME_PER_SECOND, u64::MAX),
++		Weight::from_parts(MAX_BLOCK_REF_TIME, u64::MAX),
+ 		NORMAL_DISPATCH_RATIO,
+ 	);
+-	pub RuntimeBlockLength: BlockLength = BlockLength::max_with_normal_ratio(5 * 1024 * 1024, NORMAL_DISPATCH_RATIO);
++	pub RuntimeBlockLength: BlockLength = BlockLength::max_with_normal_ratio(MAX_BLOCK_LENGTH, NORMAL_DISPATCH_RATIO);
+ 	pub const SS58Prefix: u8 = 42;
+ }
+ 
+@@ -162,3 +172,8 @@ impl pallet_template::Config for Runtime {
+ 	type RuntimeEvent = RuntimeEvent;
+ 	type WeightInfo = pallet_template::weights::SubstrateWeight<Runtime>;
+ }
++
++/// Configure the pallet-pqc-bench in pallets/pqc-bench.
++impl pallet_pqc_bench::Config for Runtime {
++        type RuntimeEvent = RuntimeEvent;
++}
+diff --git a/runtime/src/lib.rs b/runtime/src/lib.rs
+index f25b841..efb531d 100644
+--- a/runtime/src/lib.rs
++++ b/runtime/src/lib.rs
+@@ -225,4 +225,7 @@ mod runtime {
+ 	// Include the custom logic from the pallet-template in the runtime.
+ 	#[runtime::pallet_index(7)]
+ 	pub type Template = pallet_template;
++
++    #[runtime::pallet_index(8)]
++    pub type PqcBench = pallet_pqc_bench;
+ }

@@ -1,0 +1,40 @@
+[package]
+name = "pallet-pqc-bench"
+version = "0.1.0"
+edition = "2021"
+license = "MIT-0"
+homepage = "https://substrate.io"
+repository = "https://github.com/paritytech/polkadot-sdk-solochain-template.git"
+description = "Pallet weryfikujacy podpisy ECDSA/Dilithium2/SPHINCS+ do benchmarkow PQC"
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
+
+[dependencies]
+codec = { default-features = false, features = ["derive"], workspace = true }
+scale-info = { default-features = false, features = ["derive"], workspace = true }
+frame-support = { workspace = true, default-features = false }
+frame-system = { workspace = true, default-features = false }
+sp-core = { workspace = true, default-features = false }
+sp-io = { workspace = true, default-features = false }
+
+fips204 = { version = "0.4", default-features = false, features = ["ml-dsa-44"] }
+fips205 = { version = "0.4", default-features = false, features = ["slh_dsa_sha2_128f"] }
+
+[features]
+default = ["std"]
+std = [
+    "codec/std",
+    "scale-info/std",
+    "frame-support/std",
+    "frame-system/std",
+    "sp-core/std",
+    "sp-io/std",
+]
+
+[dev-dependencies]
+fips204 = { version = "0.4", features = ["default-rng"] }
+fips205 = { version = "0.4", features = ["default-rng"] }
+sp-core = { workspace = true, features = ["std"] }
+hex = "0.4"
+serde_json = "1.0"
